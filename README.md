@@ -1,6 +1,8 @@
-# 🎮 Instalador de Modpack Minecraft - NeoForge
+# 🎮 Modpack Minecraft 1.21.11 - NeoForge
 
-Instalador automático personalizado para distribuir modpacks de Minecraft con NeoForge, mods, resource packs y shaders.
+**Autor:** MaxitoDev
+
+Instalador automático profesional para distribuir modpacks de Minecraft con NeoForge, mods, resource packs y shaders.
 
 ## 📋 Requisitos
 
@@ -20,11 +22,13 @@ Instalador automático personalizado para distribuir modpacks de Minecraft con N
    ├── resourcepacks/   → Archivos .zip de resource packs
    ├── shaderpacks/     → Archivos .zip de shader packs
    └── config/          → Configuraciones personalizadas (opcional)
-   ```
+   ```:
 
-2. **Crear el ejecutable** (3 opciones):
+   **Opción A - Usar los scripts automatizados** (Recomendado):
+   - Ejecuta `3_Build_Completo.bat` para compilar el instalador y crear el ZIP automáticamente
+   - O ejecuta `1_Compilar_Instalador.bat` solo para compilar el .exe
 
-   **Opción A - Usando PS2EXE** (Recomendado para distribución):
+   **Opción B - Compilar manualmente con PS2EXE**:
    ```powershell
    # Abrir PowerShell como Administrador
    Install-Module -Name ps2exe -Scope CurrentUser
@@ -33,51 +37,58 @@ Instalador automático personalizado para distribuir modpacks de Minecraft con N
    cd "C:\Users\maxsa\Downloads\mcpack"
    
    # Crear el .exe
-   Invoke-PS2EXE -inputFile ".\Installer.ps1" -outputFile ".\InstaladorModpack.exe" -title "Instalador Modpack" -version "1.0.0.0"
+   Invoke-PS2EXE -inputFile ".\Installer.ps1" -outputFile ".\Modpack.exe" -title "Modpack" -version "1.0.4.0" -company "MaxitoDev"
    ```
 
-   **Opción B - Usar el archivo .BAT** (Más simple):
+   **Opción C - Usar el archivo .BAT** (Para pruebas):
    - Doble clic en `Ejecutar_Instalador.bat`
-
    **Opción C - Ejecutar directamente**:
    - Clic derecho en `Installer.ps1` → **Ejecutar con PowerShell**
 
-3. **Distribuir tu modpack**:
-   - Comprime toda la carpeta en un .zip
+3. **Ejecuta `2_Crear_ZIP.bat` para crear el archivo de distribución
+   - Comparte el archivo .zip con tus usuarios
+   - O sube el .zip a Google Drive, Mega, MediaFire, etc.en un .zip
    - Comparte con tus usuarios
 
 ### Para Usuarios que instalan el Modpack
 
-1. Descomprime el archivo .zip que recibiste
-2. Ejecuta `InstaladorModpack.exe` o `Ejecutar_Instalador.bat`
+1. DescompriModpack.exe` (o `Ejecutar_Instalador.bat`)
 3. Sigue las instrucciones en pantalla
+4. Abre Minecraft Launcher y selecciona el perfil **"Modpack - by MaxitoDev - Minecraft 1.21.11"**
+5. ¡A jugar! Los resource packs y shaders ya están activados automáticamentela
 4. ¡Abre Minecraft Launcher y juega!
 
 ## 📁 Estructura del Proyecto
 
 ```
 mcpack/
+│🎮 Modpack.exe                # Instalador compilado
+├── 🚀 Ejecutar_Instalador.bat    # Lanzador alternativo
 │
-├── 📄 Installer.ps1              # Script principal de instalación
-├── 🚀 Ejecutar_Instalador.bat    # Lanzador del instalador (alternativa al .exe)
+├── 🔧 1_Compilar_Instalador.bat  # Compila el .exe
+├── 📦 2_Crear_ZIP.bat            # Crea el archivo de distribución
+├── ⚡ 3_Build_Completo.bat       # Build automático completo
+│
 ├── 📄 INSTRUCCIONES.txt          # Guía rápida
 ├── 📖 README.md                  # Este archivo
+├── 🚫 .gitignore                 # Configuración de Git
 │
 ├── 📁 installer/                 # Coloca aquí el instalador de NeoForge
-│   └── ⚠️ neoforge-X.X.X-installer.jar
+│   └── neoforge-21.11.37-beta-installer.jar
 │
 ├── 📁 mods/                      # Coloca aquí todos los mods (.jar)
-│   ├── ejemplo-mod-1.jar
-│   ├── ejemplo-mod-2.jar
-│   └── ...
+│   └── (82 mods incluidos)
 │
-├── 📁 resourcepacks/             # Coloca aquí los resource packs (.zip)
-│   ├── ejemplo-resourcepack.zip
-│   └── ...
+├── 📁 resourcepacks/             # Resource packs (.zip)
+│   ├── Alacrity.zip
+│   └── FreshAnimations_v1.10.3.zip
 │
-├── 📁 shaderpacks/               # Coloca aquí los shader packs (.zip)
-│   ├── ejemplo-shaders.zip
-│   └── ...
+├── 📁 shaderpacks/               # Shader packs (.zip)
+│   ├── Bliss_v2.1.2.zip
+│   ├── ComplementaryReimagined_r5.6.1.zip
+│   └── ComplementaryUnbound_r5.6.1.zip
+│
+└── 📁 config/                    # Configuraciones personalizadas
 │
 └── 📁 config/                    # Configuraciones personalizadas (opcional)
     └── ...
@@ -86,7 +97,11 @@ mcpack/
 ## ✨ Características
 
 El instalador automáticamente:
-
+**Activa automáticamente los resource packs** en el juego
+- ✅ **Activa automáticamente el shader** en el juego
+- ✅ **Renombra el perfil del launcher** a un nombre personalizado
+- ✅ **Cambia el icono** del perfil en el launcher
+- ✅ 
 - ✅ Verifica que Java esté instalado
 - ✅ Instala NeoForge ejecutando su instalador oficial
 - ✅ Copia todos los mods a `.minecraft/mods`
@@ -108,8 +123,16 @@ param(
 )
 ```
 
-O ejecuta el script con parámetros:
+O ejecuta el script con parámetros:Modpack.exe" -iconFile ".\icon.ico"
+   ```
 
+### Cambiar el nombre del perfil en el launcher
+
+Edita [Installer.ps1](Installer.ps1) y busca esta línea:
+```powershell
+$customName = "Modpack - by MaxitoDev - Minecraft 1.21.11"
+```
+Cámbiala por el nombre que prefieras.
 ```powershell
 .\Installer.ps1 -MinecraftPath "C:\MiMinecraft"
 ```
@@ -141,11 +164,20 @@ Invoke-PS2EXE -inputFile ".\Installer.ps1" `
 
 ### "No se encontró el instalador de NeoForge"
 - Verifica que el archivo .jar de NeoForge esté en la carpeta `installer/`
-- El nombre debe comenzar con `neoforge-`
+- El nombre debe
 
-### "No se pueden ejecutar scripts"
-- Abre PowerShell como Administrador y ejecuta:
-  ```powershell
+- **Minecraft:** 1.21.11
+- **NeoForge:** 21.11.37-beta
+- **Mods incluidos:** 82+
+- **Resource Packs:** Alacrity, FreshAnimations v1.10.3
+- **Shaders:** Bliss v2.1.2, Complementary Reimagined r5.6.1, Complementary Unbound r5.6.1
+
+### Compatibilidad
+
+Este instalador es compatible con todas las versiones de NeoForge. Para usar otra versión:
+1. Reemplaza el .jar en la carpeta `installer/`
+2. Actualiza los mods para que sean compatibles con esa versión
+3. Recompila el instalador
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
   ```
 
@@ -164,7 +196,7 @@ Invoke-PS2EXE -inputFile ".\Installer.ps1" `
 Este instalador es compatible con todas las versiones de NeoForge. Solo asegúrate de:
 1. Tener el instalador correcto (.jar) en la carpeta `installer/`
 2. Que los mods sean compatibles con la versión de Minecraft/NeoForge
-
+Creado con ❤️ por MaxitoDev
 ## 🤝 Contribuciones
 
 Si quieres mejorar este instalador:

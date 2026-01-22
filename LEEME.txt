@@ -1,0 +1,115 @@
+═══════════════════════════════════════════════════════════════════
+  MODPACK MINECRAFT 1.21.11 - INSTRUCCIONES DE INSTALACION
+  Por MaxitoDev
+═══════════════════════════════════════════════════════════════════
+
+¡Bienvenido! Sigue estos simples pasos para instalar el modpack.
+
+═══════════════════════════════════════════════════════════════════
+  REQUISITOS PREVIOS
+═══════════════════════════════════════════════════════════════════
+
+Antes de comenzar, asegurate de tener:
+
+1. ✓ Minecraft Java Edition instalado
+2. ✓ Java 17 o superior instalado
+   
+   ¿No tienes Java? Descargalo aqui:
+   https://adoptium.net/
+   
+   IMPORTANTE: Durante la instalacion, marca la opcion
+   "Agregar al PATH" o "Add to PATH"
+
+═══════════════════════════════════════════════════════════════════
+  PASOS DE INSTALACION
+═══════════════════════════════════════════════════════════════════
+
+PASO 1: DESCOMPRIMIR
+────────────────────
+Ya hiciste este paso si estas leyendo esto :)
+
+
+PASO 2: EJECUTAR EL INSTALADOR
+──────────────────────────────
+Haz doble clic en el archivo "Modpack.exe"
+
+
+PASO 3: SEGUIR LAS INSTRUCCIONES
+────────────────────────────────
+El instalador te preguntara si deseas continuar.
+Escribe "S" y presiona Enter.
+
+
+PASO 4: ESPERAR
+───────────────
+El instalador hara todo automaticamente:
+  - Instalara NeoForge
+  - Copiara los mods (82+ mods)
+  - Instalara resource packs
+  - Instalara shaders
+  - Configurara todo automaticamente
+
+
+PASO 5: ABRIR MINECRAFT
+───────────────────────
+1. Abre el Minecraft Launcher
+2. Busca el perfil: "Modpack - by MaxitoDev - Minecraft 1.21.11"
+3. Haz clic en JUGAR
+4. ¡Disfruta!
+
+═══════════════════════════════════════════════════════════════════
+  CONTENIDO DEL MODPACK
+═══════════════════════════════════════════════════════════════════
+
+✓ NeoForge 21.11.37-beta
+✓ 82+ Mods optimizados
+✓ Resource Packs: Alacrity, FreshAnimations
+✓ Shaders: Bliss, Complementary Reimagined, Complementary Unbound
+
+Todo preconfigurado y listo para jugar!
+
+═══════════════════════════════════════════════════════════════════
+  PROBLEMAS COMUNES
+═══════════════════════════════════════════════════════════════════
+
+PROBLEMA: "Java no esta instalado"
+SOLUCION: Descarga e instala Java desde https://adoptium.net/
+
+
+PROBLEMA: El instalador no abre
+SOLUCION: 
+  - Haz clic derecho en Modpack.exe
+  - Selecciona "Ejecutar como administrador"
+  - Si tu antivirus lo bloquea, permitelo temporalmente
+
+
+PROBLEMA: No veo el perfil en el launcher
+SOLUCION: 
+  - Cierra completamente el Minecraft Launcher
+  - Abrelo de nuevo
+  - El perfil deberia aparecer ahora
+
+
+PROBLEMA: El juego crashea al iniciar
+SOLUCION:
+  - Verifica que tengas Java 17 o superior
+  - Asegurate de tener suficiente RAM asignada (minimo 4GB)
+
+═══════════════════════════════════════════════════════════════════
+  NOTA IMPORTANTE
+═══════════════════════════════════════════════════════════════════
+
+Los resource packs y shaders YA ESTAN ACTIVADOS automaticamente.
+No necesitas hacer nada mas, solo jugar!
+
+Si quieres cambiar los shaders, ve a:
+Opciones → Video Settings → Shaders
+
+═══════════════════════════════════════════════════════════════════
+
+¿Problemas? ¿Sugerencias?
+Contacto: MaxitoDev
+
+¡Disfruta el modpack!
+
+═══════════════════════════════════════════════════════════════════

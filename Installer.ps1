@@ -33,8 +33,8 @@ function Write-ColorText {
 function Write-Header {
     Clear-Host
     Write-ColorText "================================================================" -Color Cyan
-    Write-ColorText "     Autor: MaxitoDev" -Color Cyan
     Write-ColorText "     INSTALADOR DE MODPACK MINECRAFT - NEOFORGE" -Color Cyan
+    Write-ColorText "     Autor: MaxitoDev" -Color Cyan
     Write-ColorText "================================================================" -Color Cyan
     Write-Host ""
 }
@@ -231,6 +231,137 @@ function Copy-Configs {
     return $true
 }
 
+function Configure-GameSettings {
+    Write-ColorText "`nConfigurando opciones del juego..." -Color Yellow
+    
+    $optionsFile = Join-Path $MinecraftPath "options.txt"
+    
+    # Obtener lista de resource packs instalados
+    $resourcepacksPath = Join-Path $MinecraftPath "resourcepacks"
+    $installedPacks = Get-ChildItem -Path $resourcepacksPath -Filter "*.zip" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name
+    
+    # Obtener shader instalado (usar el primero encontrado)
+    $shaderpacksPath = Join-Path $MinecraftPath "shaderpacks"
+    $installedShader = Get-ChildItem -Path $shaderpacksPath -Filter "*.zip" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Name
+    
+    if ($installedPacks.Count -eq 0 -and -not $installedShader) {
+        Write-ColorText "  No hay resource packs o shaders para configurar" -Color Gray
+        return $true
+    }
+    
+    # Leer options.txt existente o crear nuevo
+    $optionsContent = @()
+    $resourcePacksConfigured = $false
+    $shaderConfigured = $false
+    
+    if (Test-Path $optionsFile) {
+        $optionsContent = Get-Content $optionsFile
+    }
+    
+    # Construir lista de resource packs en formato JSON
+    if ($installedPacks.Count -gt 0) {
+        $packsJson = ($installedPacks | ForEach-Object { "`"file/$_`"" }) -join ","
+        $resourcePacksLine = "resourcePacks:[$packsJson]"
+        
+        # Buscar y reemplazar la linea de resourcePacks
+        for ($i = 0; $i -lt $optionsContent.Count; $i++) {
+            if ($optionsContent[$i] -match '^resourcePacks:') {
+                $optionsContent[$i] = $resourcePacksLine
+                $resourcePacksConfigured = $true
+                break
+            }
+        }
+        
+        # Si no existe, agregar
+        if (-not $resourcePacksConfigured) {
+            $optionsContent += $resourcePacksLine
+        }
+        
+        Write-ColorText "  OK - Resource packs configurados: $($installedPacks.Count)" -Color Green
+    }
+    
+    # Configurar shader (para Iris/Optifine)
+    if ($installedShader) {
+        $shaderLine = "shaderPack:$installedShader"
+        
+        # Buscar y reemplazar la linea de shader
+        for ($i = 0; $i -lt $optionsContent.Count; $i++) {
+            if ($optionsContent[$i] -match '^shaderPack:') {
+                $optionsContent[$i] = $shaderLine
+                $shaderConfigured = $true
+                break
+            }
+        }
+        
+        # Si no existe, agregar
+        if (-not $shaderConfigured) {
+            $optionsContent += $shaderLine
+        }
+        
+        Write-ColorText "  OK - Shader configurado: $installedShader" -Color Green
+    }
+    
+    # Guardar options.txt
+    try {
+        $optionsContent | Set-Content -Path $optionsFile -Encoding UTF8
+        Write-ColorText "  OK - Configuracion del juego actualizada" -Color Green
+    } catch {
+        Write-ColorText "  Advertencia: No se pudo actualizar options.txt: $_" -Color Yellow
+    }
+    
+    return $true
+}
+
+function Configure-LauncherProfile {
+    Write-ColorText "`nConfigurando perfil del launcher..." -Color Yellow
+    
+    $launcherProfilesFile = Join-Path $MinecraftPath "launcher_profiles.json"
+    
+    if (-not (Test-Path $launcherProfilesFile)) {
+        Write-ColorText "  Advertencia: No se encontro launcher_profiles.json" -Color Yellow
+        return $true
+    }
+    
+    try {
+        # Leer el archivo JSON
+        $profilesJson = Get-Content $launcherProfilesFile -Raw | ConvertFrom-Json
+        
+        # Buscar el perfil de NeoForge (puede tener diferentes nombres)
+        $neoforgeProfile = $null
+        $neoforgeKey = $null
+        
+        foreach ($key in $profilesJson.profiles.PSObject.Properties.Name) {
+            $profile = $profilesJson.profiles.$key
+            if ($profile.name -match 'neoforge' -or $profile.lastVersionId -match 'neoforge') {
+                $neoforgeProfile = $profile
+                $neoforgeKey = $key
+                break
+            }
+        }
+        
+        if ($neoforgeProfile) {
+            # Renombrar el perfil
+            $customName = "Modpack - by MaxitoDev - Minecraft 1.21.11"
+            $neoforgeProfile.name = $customName
+            
+            # Opcional: cambiar el icono (puedes usar otros iconos de Minecraft)
+            # Iconos disponibles: Grass, Crafting_Table, Furnace, etc.
+            $neoforgeProfile.icon = "Grass"
+            
+            # Guardar cambios
+            $profilesJson | ConvertTo-Json -Depth 10 | Set-Content $launcherProfilesFile -Encoding UTF8
+            
+            Write-ColorText "  OK - Perfil renombrado a: $customName" -Color Green
+        } else {
+            Write-ColorText "  Advertencia: No se encontro el perfil de NeoForge" -Color Yellow
+        }
+    } catch {
+        Write-ColorText "  Advertencia: No se pudo modificar el perfil: $_" -Color Yellow
+    }
+    
+    return $true
+}
+
 # ============================================
 # PROGRAMA PRINCIPAL
 # ============================================
@@ -304,6 +435,16 @@ if ($success) {
     Copy-Configs
 }
 
+# Configurar opciones del juego (resource packs y shaders)
+if ($success) {
+    Configure-GameSettings
+}
+
+# Configurar perfil del launcher
+if ($success) {
+    Configure-LauncherProfile
+}
+
 # Resultado final
 Write-Host ""
 Write-ColorText "================================================================" -Color Cyan
@@ -312,7 +453,7 @@ if ($success) {
     Write-ColorText "OK - INSTALACION COMPLETADA CON EXITO!" -Color Green
     Write-Host ""
     Write-ColorText "El modpack ha sido instalado correctamente." -Color White
-    Write-ColorText "Ahora puedes abrir el Minecraft Launcher y seleccionar el perfil de NeoForge." -Color Gray
+    Write-ColorText "Ahora puedes abrir el Minecraft Launcher y seleccionar el perfil 'Modpack 1.21.11'." -Color Gray
 } else {
     Write-ColorText "ERROR - LA INSTALACION FINALIZO CON ERRORES" -Color Red
     Write-Host ""
