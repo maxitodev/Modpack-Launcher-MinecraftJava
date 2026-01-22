@@ -63,11 +63,13 @@ function Install-NeoForge {
     Write-ColorText "  Ejecutando instalador de NeoForge..." -Color Gray
     
     try {
-        # Ejecutar el instalador de NeoForge
-        $process = Start-Process -FilePath "java" -ArgumentList "-jar", "`"$($neoforgeJar.FullName)`"" -Wait -PassThru -NoNewWindow
+        # Ejecutar el instalador de NeoForge con parametro --installClient
+        $process = Start-Process -FilePath "java" -ArgumentList "-jar", "`"$($neoforgeJar.FullName)`"", "--installClient" -Wait -PassThru -NoNewWindow
         
         if ($process.ExitCode -eq 0) {
             Write-ColorText "  OK - NeoForge instalado correctamente" -Color Green
+            Write-ColorText "  Esperando a que se cree el perfil..." -Color Gray
+            Start-Sleep -Seconds 5
             return $true
         } else {
             Write-ColorText "  ERROR: El instalador de NeoForge finalizo con errores" -Color Red
@@ -280,33 +282,38 @@ function Configure-GameSettings {
         Write-ColorText "  OK - Resource packs configurados: $($installedPacks.Count)" -Color Green
     }
     
-    # Configurar shader (para Iris/Optifine)
-    if ($installedShader) {
-        $shaderLine = "shaderPack:$installedShader"
-        
-        # Buscar y reemplazar la linea de shader
-        for ($i = 0; $i -lt $optionsContent.Count; $i++) {
-            if ($optionsContent[$i] -match '^shaderPack:') {
-                $optionsContent[$i] = $shaderLine
-                $shaderConfigured = $true
-                break
-            }
-        }
-        
-        # Si no existe, agregar
-        if (-not $shaderConfigured) {
-            $optionsContent += $shaderLine
-        }
-        
-        Write-ColorText "  OK - Shader configurado: $installedShader" -Color Green
-    }
-    
     # Guardar options.txt
     try {
         $optionsContent | Set-Content -Path $optionsFile -Encoding UTF8
-        Write-ColorText "  OK - Configuracion del juego actualizada" -Color Green
+        Write-ColorText "  OK - Resource packs activados en options.txt" -Color Green
     } catch {
         Write-ColorText "  Advertencia: No se pudo actualizar options.txt: $_" -Color Yellow
+    }
+    
+    # Configurar shader para Iris
+    if ($installedShader) {
+        $irisConfigDir = Join-Path $MinecraftPath "config\iris"
+        $irisConfigFile = Join-Path $irisConfigDir "iris.properties"
+        
+        # Crear directorio de Iris si no existe
+        if (-not (Test-Path $irisConfigDir)) {
+            New-Item -ItemType Directory -Path $irisConfigDir -Force | Out-Null
+        }
+        
+        try {
+            # Crear o actualizar iris.properties
+            $irisConfig = @"
+enableShaders=true
+shaderPack=$installedShader
+enableDebugOptions=false
+maxShadowRenderDistance=12
+"@
+            
+            $irisConfig | Set-Content -Path $irisConfigFile -Encoding UTF8
+            Write-ColorText "  OK - Shader configurado para Iris: $installedShader" -Color Green
+        } catch {
+            Write-ColorText "  Advertencia: No se pudo configurar Iris: $_" -Color Yellow
+        }
     }
     
     return $true
@@ -332,20 +339,18 @@ function Configure-LauncherProfile {
         
         foreach ($key in $profilesJson.profiles.PSObject.Properties.Name) {
             $profile = $profilesJson.profiles.$key
-            if ($profile.name -match 'neoforge' -or $profile.lastVersionId -match 'neoforge') {
+            if ($profile.name -match 'neoforge' -or $profile.lastVersionId -match 'neoforge' -or $profile.lastVersionId -match '1\.21\.1') {
                 $neoforgeProfile = $profile
                 $neoforgeKey = $key
                 break
             }
         }
         
+        $customName = "Modpack - by MaxitoDev - Minecraft 1.21.11"
+        
         if ($neoforgeProfile) {
-            # Renombrar el perfil
-            $customName = "Modpack - by MaxitoDev - Minecraft 1.21.11"
+            # Renombrar el perfil existente
             $neoforgeProfile.name = $customName
-            
-            # Opcional: cambiar el icono (puedes usar otros iconos de Minecraft)
-            # Iconos disponibles: Grass, Crafting_Table, Furnace, etc.
             $neoforgeProfile.icon = "Grass"
             
             # Guardar cambios
@@ -353,10 +358,31 @@ function Configure-LauncherProfile {
             
             Write-ColorText "  OK - Perfil renombrado a: $customName" -Color Green
         } else {
-            Write-ColorText "  Advertencia: No se encontro el perfil de NeoForge" -Color Yellow
+            # Crear perfil nuevo si no existe
+            Write-ColorText "  Creando nuevo perfil del modpack..." -Color Gray
+            
+            $newProfileId = "modpack_maxitodev_" + (Get-Random)
+            $newProfile = @{
+                name = $customName
+                type = "custom"
+                created = (Get-Date -Format "o")
+                lastUsed = (Get-Date -Format "o")
+                icon = "Grass"
+                lastVersionId = "neoforge-21.1.37"
+                javaArgs = "-Xmx4G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M"
+            }
+            
+            # Agregar el nuevo perfil
+            $profilesJson.profiles | Add-Member -MemberType NoteProperty -Name $newProfileId -Value ([PSCustomObject]$newProfile)
+            
+            # Guardar cambios
+            $profilesJson | ConvertTo-Json -Depth 10 | Set-Content $launcherProfilesFile -Encoding UTF8
+            
+            Write-ColorText "  OK - Perfil creado: $customName" -Color Green
         }
     } catch {
         Write-ColorText "  Advertencia: No se pudo modificar el perfil: $_" -Color Yellow
+        Write-ColorText "  Error: $_" -Color Red
     }
     
     return $true
@@ -440,10 +466,8 @@ if ($success) {
     Configure-GameSettings
 }
 
-# Configurar perfil del launcher
-if ($success) {
-    Configure-LauncherProfile
-}
+# No renombramos el perfil, usamos el que crea NeoForge por defecto
+# Configure-LauncherProfile
 
 # Resultado final
 Write-Host ""
@@ -453,7 +477,8 @@ if ($success) {
     Write-ColorText "OK - INSTALACION COMPLETADA CON EXITO!" -Color Green
     Write-Host ""
     Write-ColorText "El modpack ha sido instalado correctamente." -Color White
-    Write-ColorText "Ahora puedes abrir el Minecraft Launcher y seleccionar el perfil 'Modpack 1.21.11'." -Color Gray
+    Write-ColorText "Ahora abre el Minecraft Launcher y selecciona el perfil de NeoForge" -Color Gray
+    Write-ColorText "(busca un perfil que contenga 'neoforge' en el nombre)" -Color Gray
 } else {
     Write-ColorText "ERROR - LA INSTALACION FINALIZO CON ERRORES" -Color Red
     Write-Host ""
