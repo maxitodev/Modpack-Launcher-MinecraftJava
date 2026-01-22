@@ -1,0 +1,28 @@
+# Archivos binarios grandes - NO subir a Git
+*.jar
+*.zip
+*.exe
+
+# Carpetas con contenido binario
+mods/*.jar
+resourcepacks/*.zip
+shaderpacks/*.zip
+installer/*.jar
+
+# Mantener las carpetas vacias (crear archivos .gitkeep)
+!mods/.gitkeep
+!resourcepacks/.gitkeep
+!shaderpacks/.gitkeep
+!installer/.gitkeep
+
+# Archivos temporales de Windows
+Thumbs.db
+desktop.ini
+*.lnk
+
+# Logs
+*.log
+
+# Archivos de configuracion local
+.vscode/
+.vs/

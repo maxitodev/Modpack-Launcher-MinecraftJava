@@ -1,0 +1,6 @@
+# Información del Modpack
+# Coloca aquí archivos de configuración de mods si los necesitas
+# Estos archivos se copiarán a la carpeta .minecraft/config
+
+# Ejemplo: Si tienes configuraciones personalizadas de mods,
+# cópialas aquí manteniendo la estructura de carpetas

@@ -1,0 +1,99 @@
+═══════════════════════════════════════════════════════════════════
+  INSTRUCCIONES PARA COLOCAR TUS ARCHIVOS
+═══════════════════════════════════════════════════════════════════
+
+ANTES DE CREAR EL INSTALADOR, COLOCA TUS ARCHIVOS EN LAS SIGUIENTES CARPETAS:
+
+1. 📁 installer/
+   └─ Coloca aquí el archivo .jar de NeoForge
+      Ejemplo: neoforge-1.20.1-47.1.3-installer.jar
+      
+2. 📁 mods/
+   └─ Coloca aquí todos los archivos .jar de los mods
+      Ejemplo: OptiFine.jar, JEI.jar, etc.
+      
+3. 📁 resourcepacks/
+   └─ Coloca aquí todos los resource packs (.zip)
+      Ejemplo: Faithful-32x.zip, etc.
+      
+4. 📁 shaderpacks/
+   └─ Coloca aquí todos los shader packs (.zip)
+      Ejemplo: BSL_Shaders.zip, Complementary_Shaders.zip, etc.
+      
+5. 📁 config/ (OPCIONAL)
+   └─ Si tienes configuraciones personalizadas de mods,
+      colócalas aquí manteniendo la estructura de carpetas
+
+═══════════════════════════════════════════════════════════════════
+  CÓMO CREAR EL EJECUTABLE (.EXE)
+═══════════════════════════════════════════════════════════════════
+
+OPCIÓN 1 - Usar PS2EXE (Recomendado)
+────────────────────────────────────────
+
+1. Abre PowerShell como Administrador
+
+2. Instala PS2EXE:
+   Install-Module -Name ps2exe -Scope CurrentUser
+
+3. Navega a esta carpeta:
+   cd "C:\Users\maxsa\Downloads\mcpack"
+
+4. Crea el ejecutable:
+   Invoke-PS2EXE -inputFile ".\Installer.ps1" -outputFile ".\InstaladorModpack.exe" -iconFile ".\icon.ico" -title "Instalador Modpack" -version "1.0.0.0" -noConsole:$false
+
+   (Si no tienes icon.ico, omite el parámetro -iconFile)
+
+5. ¡Listo! Ahora tienes InstaladorModpack.exe
+
+
+OPCIÓN 2 - Distribuir como .BAT (Más simple)
+────────────────────────────────────────────
+
+Si prefieres algo más simple, usa el archivo "Ejecutar_Instalador.bat"
+que ya está incluido. Solo haz doble clic en él.
+
+
+OPCIÓN 3 - Ejecutar directamente el PowerShell
+────────────────────────────────────────────────
+
+Haz clic derecho en "Installer.ps1" → Ejecutar con PowerShell
+
+═══════════════════════════════════════════════════════════════════
+  CÓMO USAR EL INSTALADOR
+═══════════════════════════════════════════════════════════════════
+
+1. Asegúrate de tener Java 17 o superior instalado
+   Descarga: https://adoptium.net/
+
+2. Ejecuta el instalador:
+   - Doble clic en InstaladorModpack.exe, o
+   - Doble clic en Ejecutar_Instalador.bat
+
+3. El instalador hará lo siguiente automáticamente:
+   ✓ Verificará que Java esté instalado
+   ✓ Instalará NeoForge
+   ✓ Copiará todos los mods a .minecraft/mods
+   ✓ Copiará los resource packs a .minecraft/resourcepacks
+   ✓ Copiará los shader packs a .minecraft/shaderpacks
+   ✓ Copiará las configuraciones a .minecraft/config
+
+4. Una vez terminado, abre Minecraft Launcher y selecciona
+   el perfil de NeoForge
+
+═══════════════════════════════════════════════════════════════════
+  DISTRIBUCIÓN DEL MODPACK
+═══════════════════════════════════════════════════════════════════
+
+Para compartir tu modpack con otros usuarios:
+
+1. Comprime toda esta carpeta (mcpack) en un archivo .zip
+
+2. Los usuarios deberán:
+   - Descomprimir el .zip
+   - Ejecutar InstaladorModpack.exe o Ejecutar_Instalador.bat
+   - Seguir las instrucciones en pantalla
+
+═══════════════════════════════════════════════════════════════════
+
+¿Necesitas ayuda? Revisa el archivo README.md para más detalles.
