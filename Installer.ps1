@@ -473,6 +473,18 @@ if ($success) {
     Write-ColorText "El modpack ha sido instalado correctamente." -Color White
     Write-ColorText "Ahora abre el Minecraft Launcher y selecciona el perfil de NeoForge" -Color Gray
     Write-ColorText "(busca un perfil que contenga 'neoforge' en el nombre)" -Color Gray
+    Write-Host ""
+    Write-ColorText "IMPORTANTE - Configuracion de RAM:" -Color Yellow
+    Write-ColorText "  El perfil esta configurado con 8GB de RAM" -Color White
+    Write-ColorText "  Si tienes 16GB+ de RAM, puedes aumentarla para mejor rendimiento:" -Color Gray
+    Write-ColorText "  1. Edita el perfil en el launcher (tres puntos ... → Editar)" -Color Gray
+    Write-ColorText "  2. Ve a 'Mas opciones' o 'More Options'" -Color Gray
+    Write-ColorText "  3. En 'Argumentos JVM' cambia -Xmx8G por -Xmx10G o -Xmx12G" -Color Gray
+    Write-Host ""
+    Write-ColorText "NO OLVIDES - Activar Resource Packs:" -Color Yellow
+    Write-ColorText "  1. Inicia el juego" -Color Gray
+    Write-ColorText "  2. Ve a Opciones → Resource Packs" -Color Gray
+    Write-ColorText "  3. Activa: Alacrity y FreshAnimations" -Color Gray
 } else {
     Write-ColorText "ERROR - LA INSTALACION FINALIZO CON ERRORES" -Color Red
     Write-Host ""

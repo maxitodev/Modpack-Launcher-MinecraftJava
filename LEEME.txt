@@ -93,17 +93,44 @@ SOLUCION:
 PROBLEMA: El juego crashea al iniciar
 SOLUCION:
   - Verifica que tengas Java 17 o superior
-  - Asegurate de tener suficiente RAM asignada (minimo 4GB)
+  - Asegurate de tener suficiente RAM asignada (minimo 8GB)
+
+
+PROBLEMA: El juego va lento o con lag
+SOLUCION: Aumenta la RAM asignada al perfil
+  1. Abre el Minecraft Launcher
+  2. Selecciona el perfil del modpack
+  3. Haz clic en los tres puntos (...) → Editar
+  4. Ve a "Mas opciones" o "More Options"
+  5. En "Argumentos JVM" busca "-Xmx8G"
+  6. Cambia el numero segun tu RAM:
+     - Si tienes 16GB RAM → usa -Xmx10G o -Xmx12G
+     - Si tienes 12GB RAM → usa -Xmx8G
+     - Si tienes 8GB RAM → deja -Xmx6G
+  7. Guarda y prueba de nuevo
 
 ═══════════════════════════════════════════════════════════════════
-  NOTA IMPORTANTE
+  CONFIGURACION POST-INSTALACION
 ═══════════════════════════════════════════════════════════════════
 
-Los resource packs y shaders YA ESTAN ACTIVADOS automaticamente.
-No necesitas hacer nada mas, solo jugar!
+ACTIVAR RESOURCE PACKS:
+──────────────────────
+1. Inicia Minecraft con el perfil del modpack
+2. Ve a Opciones → Resource Packs (Paquetes de Recursos)
+3. Activa los siguientes packs (muevelos a la derecha):
+   - Alacrity
+   - FreshAnimations
+4. Haz clic en "Done" (Hecho)
+5. El juego se recargara automaticamente
 
-Si quieres cambiar los shaders, ve a:
-Opciones → Video Settings → Shaders
+CAMBIAR SHADERS:
+───────────────
+1. En el juego, presiona ESC
+2. Ve a Opciones → Video Settings → Shaders
+3. Selecciona el shader que prefieras:
+   - Bliss
+   - Complementary Reimagined
+   - Complementary Unbound
 
 ═══════════════════════════════════════════════════════════════════
 
