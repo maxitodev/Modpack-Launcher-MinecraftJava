@@ -484,7 +484,7 @@ if ($success) {
     Write-ColorText "NO OLVIDES - Activar Resource Packs:" -Color Yellow
     Write-ColorText "  1. Inicia el juego" -Color Gray
     Write-ColorText "  2. Ve a Opciones → Resource Packs" -Color Gray
-    Write-ColorText "  3. Activa: Alacrity y FreshAnimations" -Color Gray
+    Write-ColorText "  3. Activa: Alacrity" -Color Gray
 } else {
     Write-ColorText "ERROR - LA INSTALACION FINALIZO CON ERRORES" -Color Red
     Write-Host ""
