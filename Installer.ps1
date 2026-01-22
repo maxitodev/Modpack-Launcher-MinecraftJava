@@ -238,48 +238,42 @@ function Configure-GameSettings {
     
     $optionsFile = Join-Path $MinecraftPath "options.txt"
     
-    # Obtener lista de resource packs instalados
-    $resourcepacksPath = Join-Path $MinecraftPath "resourcepacks"
-    $installedPacks = Get-ChildItem -Path $resourcepacksPath -Filter "*.zip" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name
+    # Resource packs especificos a activar
+    $requiredPacks = @("Alacrity.zip")
     
     # Obtener shader instalado (usar el primero encontrado)
     $shaderpacksPath = Join-Path $MinecraftPath "shaderpacks"
     $installedShader = Get-ChildItem -Path $shaderpacksPath -Filter "*.zip" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Name
     
-    if ($installedPacks.Count -eq 0 -and -not $installedShader) {
-        Write-ColorText "  No hay resource packs o shaders para configurar" -Color Gray
-        return $true
-    }
-    
     # Leer options.txt existente o crear nuevo
     $optionsContent = @()
-    $resourcePacksConfigured = $false
-    $shaderConfigured = $false
     
     if (Test-Path $optionsFile) {
         $optionsContent = Get-Content $optionsFile
     }
     
-    # Construir lista de resource packs en formato JSON
-    if ($installedPacks.Count -gt 0) {
-        $packsJson = ($installedPacks | ForEach-Object { "`"file/$_`"" }) -join ","
-        $resourcePacksLine = "resourcePacks:[$packsJson]"
-        
-        # Buscar y reemplazar la linea de resourcePacks
-        for ($i = 0; $i -lt $optionsContent.Count; $i++) {
-            if ($optionsContent[$i] -match '^resourcePacks:') {
-                $optionsContent[$i] = $resourcePacksLine
-                $resourcePacksConfigured = $true
-                break
-            }
+    # Activar resource packs especificos
+    $customPacks = ($requiredPacks | ForEach-Object { "`"file/$_`"" }) -join ","
+    $resourcePacksLine = "resourcePacks:[`"vanilla`",$customPacks,`"mod_resources`"]"
+    
+    # Buscar y reemplazar la linea de resourcePacks
+    $resourcePacksConfigured = $false
+    for ($i = 0; $i -lt $optionsContent.Count; $i++) {
+        if ($optionsContent[$i] -match '^resourcePacks:') {
+            $optionsContent[$i] = $resourcePacksLine
+            $resourcePacksConfigured = $true
+            break
         }
-        
-        # Si no existe, agregar
-        if (-not $resourcePacksConfigured) {
-            $optionsContent += $resourcePacksLine
-        }
-        
-        Write-ColorText "  OK - Resource packs configurados: $($installedPacks.Count)" -Color Green
+    }
+    
+    # Si no existe, agregar
+    if (-not $resourcePacksConfigured) {
+        $optionsContent += $resourcePacksLine
+    }
+    
+    Write-ColorText "  OK - Resource packs activados:" -Color Green
+    foreach ($pack in $requiredPacks) {
+        Write-ColorText "     - $pack" -Color Gray
     }
     
     # Guardar options.txt
