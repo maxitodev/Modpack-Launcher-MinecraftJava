@@ -1,0 +1,270 @@
+═══════════════════════════════════════════════════════════════════
+  SERVIDOR MINECRAFT 1.21.11 - INSTRUCCIONES DE INSTALACIÓN
+  Por MaxitoDev
+═══════════════════════════════════════════════════════════════════
+
+¡Bienvenido! Sigue estos pasos para instalar el servidor en tu VPS Linux.
+
+═══════════════════════════════════════════════════════════════════
+  REQUISITOS DEL VPS
+═══════════════════════════════════════════════════════════════════
+
+Sistema Operativo:
+  ✓ Ubuntu 20.04+ / Debian 10+
+  ✓ CentOS 8+ / Rocky Linux 8+
+  ✓ Cualquier distribución Linux moderna
+
+Hardware Recomendado:
+  ✓ RAM: Mínimo 4GB (recomendado 6-8GB)
+  ✓ CPU: 2+ cores
+  ✓ Disco: 10GB+ libres
+  ✓ Conexión: 100Mbps+
+
+Software:
+  ✓ Java 17 o superior
+  ✓ Acceso SSH al servidor
+
+═══════════════════════════════════════════════════════════════════
+  PASOS DE INSTALACIÓN
+═══════════════════════════════════════════════════════════════════
+
+PASO 1: CONECTAR AL VPS
+───────────────────────
+Desde tu PC, conéctate vía SSH:
+
+  ssh usuario@tu-servidor.com
+
+O usando la IP:
+
+  ssh usuario@123.456.789.0
+
+
+PASO 2: INSTALAR JAVA
+─────────────────────
+Si no tienes Java 17+, instálalo:
+
+En Ubuntu/Debian:
+  sudo apt update
+  sudo apt install openjdk-17-jre-headless -y
+
+En CentOS/Rocky Linux:
+  sudo yum install java-17-openjdk-headless -y
+
+Verificar instalación:
+  java -version
+
+
+PASO 3: SUBIR EL PAQUETE
+────────────────────────
+Desde tu PC, sube el archivo al VPS:
+
+  scp Modpack-Server-MaxitoDev-1.21.11.tar.gz usuario@tu-servidor.com:~
+
+O usa FileZilla, WinSCP, o cualquier cliente FTP/SFTP.
+
+
+PASO 4: DESCOMPRIMIR
+────────────────────
+En el VPS:
+
+  tar -xzf Modpack-Server-MaxitoDev-1.21.11.tar.gz
+  cd Server
+
+
+PASO 5: DAR PERMISOS DE EJECUCIÓN
+─────────────────────────────────
+
+  chmod +x install.sh
+
+
+PASO 6: EJECUTAR EL INSTALADOR
+──────────────────────────────
+
+  ./install.sh
+
+Sigue las instrucciones en pantalla.
+El instalador creará la carpeta "minecraft-server" con todo configurado.
+
+
+PASO 7: CONFIGURAR EL SERVIDOR (Opcional)
+─────────────────────────────────────────
+Edita la configuración antes de iniciar:
+
+  cd minecraft-server
+  nano server.properties
+
+Configuraciones importantes:
+  - max-players=20          # Número máximo de jugadores
+  - view-distance=10        # Distancia de visión (más = más RAM)
+  - difficulty=normal       # Dificultad del juego
+
+
+PASO 8: ABRIR PUERTO EN EL FIREWALL
+───────────────────────────────────
+Debes abrir el puerto 25565:
+
+Ubuntu/Debian (UFW):
+  sudo ufw allow 25565/tcp
+  sudo ufw reload
+
+CentOS/Rocky (firewalld):
+  sudo firewall-cmd --permanent --add-port=25565/tcp
+  sudo firewall-cmd --reload
+
+
+PASO 9: INICIAR EL SERVIDOR
+───────────────────────────
+Desde la carpeta minecraft-server:
+
+  ./start.sh
+
+El servidor iniciará. Verás los logs en pantalla.
+
+
+PASO 10: PROBAR LA CONEXIÓN
+───────────────────────────
+Desde Minecraft:
+  1. Abre Minecraft con el perfil del modpack
+  2. Multijugador → Añadir servidor
+  3. Dirección: tu-servidor.com:25565
+  4. ¡Conecta y juega!
+
+═══════════════════════════════════════════════════════════════════
+  COMANDOS ÚTILES
+═══════════════════════════════════════════════════════════════════
+
+Iniciar servidor:
+  ./start.sh
+
+Detener servidor (desde otra terminal):
+  ./stop.sh
+
+O detener con Ctrl+C en la terminal del servidor.
+
+Ver logs en tiempo real:
+  tail -f logs/latest.log
+
+═══════════════════════════════════════════════════════════════════
+  MANTENER EL SERVIDOR ACTIVO (Screen/tmux)
+═══════════════════════════════════════════════════════════════════
+
+Para que el servidor siga corriendo al cerrar SSH, usa Screen:
+
+Instalar Screen:
+  sudo apt install screen -y
+
+Iniciar servidor en Screen:
+  screen -S minecraft
+  ./start.sh
+
+Desconectarse de Screen (servidor sigue activo):
+  Presiona: Ctrl+A, luego D
+
+Reconectar a Screen:
+  screen -r minecraft
+
+═══════════════════════════════════════════════════════════════════
+  CREAR SERVICIO SYSTEMD (Recomendado)
+═══════════════════════════════════════════════════════════════════
+
+Para que el servidor inicie automáticamente al reiniciar el VPS:
+
+1. Crea el archivo de servicio:
+   sudo nano /etc/systemd/system/minecraft.service
+
+2. Pega este contenido (AJUSTA LAS RUTAS):
+
+[Unit]
+Description=Minecraft Server - Modpack NeoForge
+After=network.target
+
+[Service]
+Type=simple
+User=TU_USUARIO
+WorkingDirectory=/home/TU_USUARIO/minecraft-server
+ExecStart=/home/TU_USUARIO/minecraft-server/start.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+
+3. Guarda (Ctrl+O, Enter, Ctrl+X)
+
+4. Habilita el servicio:
+   sudo systemctl daemon-reload
+   sudo systemctl enable minecraft
+   sudo systemctl start minecraft
+
+5. Comandos:
+   sudo systemctl status minecraft    # Ver estado
+   sudo systemctl stop minecraft      # Detener
+   sudo systemctl restart minecraft   # Reiniciar
+   sudo journalctl -u minecraft -f    # Ver logs
+
+═══════════════════════════════════════════════════════════════════
+  BACKUPS
+═══════════════════════════════════════════════════════════════════
+
+Hacer backup del mundo:
+  cd minecraft-server
+  tar -czf backup-$(date +%Y%m%d-%H%M%S).tar.gz world world_nether world_the_end
+
+Restaurar backup:
+  tar -xzf backup-FECHA.tar.gz
+
+═══════════════════════════════════════════════════════════════════
+  PROBLEMAS COMUNES
+═══════════════════════════════════════════════════════════════════
+
+PROBLEMA: "Cannot allocate memory"
+SOLUCIÓN: Reduce la RAM en start.sh
+  nano start.sh
+  Cambia -Xmx4G por -Xmx2G
+
+
+PROBLEMA: "Address already in use"
+SOLUCIÓN: El puerto 25565 ya está en uso
+  Cambia server-port en server.properties
+  O detén el proceso que usa el puerto:
+    sudo lsof -i :25565
+    kill -9 PID
+
+
+PROBLEMA: No puedo conectarme al servidor
+SOLUCIÓN:
+  1. Verifica que el servidor esté corriendo: ps aux | grep java
+  2. Verifica que el puerto esté abierto: sudo netstat -tulpn | grep 25565
+  3. Verifica el firewall del VPS
+  4. Verifica el firewall de tu proveedor (panel de control)
+
+
+PROBLEMA: Lag o crashes
+SOLUCIÓN:
+  - Reduce view-distance en server.properties
+  - Aumenta RAM en start.sh (si tienes disponible)
+  - Reduce max-players
+  - Revisa logs: cat logs/latest.log
+
+═══════════════════════════════════════════════════════════════════
+  OPTIMIZACIÓN DE RENDIMIENTO
+═══════════════════════════════════════════════════════════════════
+
+Ajustar RAM (en start.sh):
+  Para VPS de 4GB: -Xms2G -Xmx3G
+  Para VPS de 8GB: -Xms4G -Xmx6G
+  Para VPS de 16GB: -Xms6G -Xmx12G
+
+Ajustar view-distance (en server.properties):
+  VPS limitado: view-distance=6
+  VPS normal: view-distance=10
+  VPS potente: view-distance=12-16
+
+═══════════════════════════════════════════════════════════════════
+
+¿Problemas? ¿Sugerencias?
+Contacto: MaxitoDev
+
+¡Disfruta tu servidor!
+
+═══════════════════════════════════════════════════════════════════

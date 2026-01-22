@@ -1,0 +1,78 @@
+═══════════════════════════════════════════════════════════════════
+  INICIO RÁPIDO - MODPACK MINECRAFT 1.21.11
+  Por MaxitoDev
+═══════════════════════════════════════════════════════════════════
+
+¿QUÉ ERES TÚ?
+
+1. SOY UN CREADOR DE MODPACKS
+   ────────────────────────────
+   
+   → Coloca tus archivos en las carpetas:
+     - installer/     (NeoForge .jar)
+     - mods/          (Mods .jar)
+     - resourcepacks/ (Resource packs .zip)
+     - shaderpacks/   (Shaders .zip)
+     - config/        (Configuraciones - opcional)
+   
+   → Para CLIENTE (Windows):
+     cd Client
+     3_Build_Completo.bat
+     
+     Resultado: Client/Modpack-MaxitoDev-1.21.11.zip
+   
+   → Para SERVIDOR (Linux):
+     Opción A - Windows con WSL:
+       cd Server
+       1_build_server.bat
+     
+     Opción B - Windows sin WSL:
+       cd Server
+       1_build_server_powershell.bat
+     
+     Opción C - Linux:
+       cd Server
+       ./1_build_server.sh
+     
+     Resultado: Server/Modpack-Server-MaxitoDev-1.21.11.zip (o .tar.gz)
+
+2. SOY UN USUARIO (Quiero instalar el cliente)
+   ────────────────────────────────────────────
+   
+   → Descomprime el ZIP que te dieron
+   → Ejecuta: Modpack.exe
+   → Sigue las instrucciones
+   → Abre Minecraft Launcher y juega!
+   
+   Ver: Client/LEEME.txt para más detalles
+
+3. SOY UN ADMINISTRADOR DE SERVIDOR
+   ─────────────────────────────────
+   
+   → Sube el .zip (o .tar.gz) a tu VPS Linux
+   → unzip Modpack-Server-MaxitoDev-1.21.11.zip
+     (o tar -xzf Modpack-Server-MaxitoDev-1.21.11.tar.gz)
+   → cd Server
+   → chmod +x install.sh
+   → ./install.sh
+   → cd minecraft-server
+   → ./start.sh
+   
+   Ver: Server/LEEME_SERVIDOR.txt para más detalles
+
+═══════════════════════════════════════════════════════════════════
+  DOCUMENTACIÓN COMPLETA
+═══════════════════════════════════════════════════════════════════
+
+→ README.md           - Documentación principal
+→ ESTRUCTURA.txt      - Estructura detallada del proyecto
+→ Client/README_CLIENT.md      - Documentación del cliente
+→ Server/README_SERVER.md      - Documentación del servidor
+→ Client/INSTRUCCIONES.txt     - Guía para creadores (cliente)
+→ Server/LEEME_SERVIDOR.txt    - Guía para administradores
+
+═══════════════════════════════════════════════════════════════════
+
+¡Listo para usar! 🎮
+
+═══════════════════════════════════════════════════════════════════

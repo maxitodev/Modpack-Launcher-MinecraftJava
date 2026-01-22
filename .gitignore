@@ -2,6 +2,7 @@
 *.jar
 *.zip
 *.exe
+*.tar.gz
 
 # Carpetas con contenido binario
 mods/*.jar
@@ -14,6 +15,14 @@ installer/*.jar
 !resourcepacks/.gitkeep
 !shaderpacks/.gitkeep
 !installer/.gitkeep
+
+# Build outputs
+Client/*.exe
+Client/*.zip
+Server/*.tar.gz
+Server/*.zip
+Server/temp_server_package.zip
+minecraft-server/
 
 # Archivos temporales de Windows
 Thumbs.db

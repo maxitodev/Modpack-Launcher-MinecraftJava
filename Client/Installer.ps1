@@ -19,6 +19,9 @@ if ($PSScriptRoot) {
     $ScriptPath = Split-Path -Parent ([System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName)
 }
 
+# Detectar la ruta padre (donde están mods, installer, etc.)
+$ParentPath = Split-Path -Parent $ScriptPath
+
 # Colores y formato
 $Host.UI.RawUI.WindowTitle = "Instalador de Modpack"
 
@@ -51,7 +54,7 @@ function Test-JavaInstalled {
 function Install-NeoForge {
     Write-ColorText "[1/4] Instalando NeoForge..." -Color Yellow
     
-    $neoforgeJar = Get-ChildItem -Path "$ScriptPath\installer" -Filter "neoforge-*.jar" | Select-Object -First 1
+    $neoforgeJar = Get-ChildItem -Path "$ParentPath\installer" -Filter "neoforge-*.jar" | Select-Object -First 1
     
     if (-not $neoforgeJar) {
         Write-ColorText "ERROR: No se encontro el instalador de NeoForge en la carpeta 'installer'" -Color Red
@@ -85,7 +88,7 @@ function Install-NeoForge {
 function Copy-Mods {
     Write-ColorText "`n[2/4] Copiando mods..." -Color Yellow
     
-    $modsSource = Join-Path $ScriptPath "mods"
+    $modsSource = Join-Path $ParentPath "mods"
     $modsDestination = Join-Path $MinecraftPath "mods"
     
     # Crear carpeta de destino si no existe
@@ -121,7 +124,7 @@ function Copy-Mods {
 function Copy-ResourcePacks {
     Write-ColorText "`n[3/4] Copiando resource packs..." -Color Yellow
     
-    $resourcepacksSource = Join-Path $ScriptPath "resourcepacks"
+    $resourcepacksSource = Join-Path $ParentPath "resourcepacks"
     $resourcepacksDestination = Join-Path $MinecraftPath "resourcepacks"
     
     # Crear carpeta de destino si no existe
@@ -157,7 +160,7 @@ function Copy-ResourcePacks {
 function Copy-ShaderPacks {
     Write-ColorText "`n[4/4] Copiando shader packs..." -Color Yellow
     
-    $shaderpacksSource = Join-Path $ScriptPath "shaderpacks"
+    $shaderpacksSource = Join-Path $ParentPath "shaderpacks"
     $shaderpacksDestination = Join-Path $MinecraftPath "shaderpacks"
     
     # Crear carpeta de destino si no existe
@@ -193,7 +196,7 @@ function Copy-ShaderPacks {
 function Copy-Configs {
     Write-ColorText "`nCopiando archivos de configuracion..." -Color Yellow
     
-    $configSource = Join-Path $ScriptPath "config"
+    $configSource = Join-Path $ParentPath "config"
     $configDestination = Join-Path $MinecraftPath "config"
     
     # Verificar si hay archivos de configuracion

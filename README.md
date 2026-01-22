@@ -1,146 +1,339 @@
 # 🎮 Modpack Minecraft 1.21.11 - NeoForge
 
-**Autor:** MaxitoDev
+**Autor:** MaxitoDev  
+**Versión:** 1.21.11  
+**NeoForge:** 21.11.37-beta
 
-Instalador automático profesional para distribuir modpacks de Minecraft con NeoForge, mods, resource packs y shaders.
+Sistema profesional de distribución de modpacks de Minecraft con soporte para **Cliente (Windows)** y **Servidor (Linux)**.
 
-## 📋 Requisitos
+---
 
-- **Windows** (7 o superior)
-- **Java 17 o superior** - [Descargar aquí](https://adoptium.net/)
-- **Minecraft Java Edition** instalado
+## 📋 Contenido del Proyecto
 
-## 🚀 Inicio Rápido
+Este proyecto incluye:
+- ✅ **82+ mods** optimizados para cliente
+- ✅ **Resource Packs:** Alacrity, FreshAnimations
+- ✅ **Shaders:** Bliss, Complementary Reimagined, Complementary Unbound
+- ✅ **Instalador automático para Windows** (Cliente)
+- ✅ **Instalador automático para Linux** (Servidor VPS)
+- ✅ **Scripts de build** para crear paquetes de distribución
+- ✅ **Configuraciones preestablecidas**
 
-### Para Creadores de Modpacks
-
-1. **Coloca tus archivos** en las carpetas correspondientes:
-   ```
-   mcpack/
-   ├── installer/        → Archivo .jar de NeoForge
-   ├── mods/            → Archivos .jar de los mods
-   ├── resourcepacks/   → Archivos .zip de resource packs
-   ├── shaderpacks/     → Archivos .zip de shader packs
-   └── config/          → Configuraciones personalizadas (opcional)
-   ```:
-
-   **Opción A - Usar los scripts automatizados** (Recomendado):
-   - Ejecuta `3_Build_Completo.bat` para compilar el instalador y crear el ZIP automáticamente
-   - O ejecuta `1_Compilar_Instalador.bat` solo para compilar el .exe
-
-   **Opción B - Compilar manualmente con PS2EXE**:
-   ```powershell
-   # Abrir PowerShell como Administrador
-   Install-Module -Name ps2exe -Scope CurrentUser
-   
-   # Navegar a la carpeta
-   cd "C:\Users\maxsa\Downloads\mcpack"
-   
-   # Crear el .exe
-   Invoke-PS2EXE -inputFile ".\Installer.ps1" -outputFile ".\Modpack.exe" -title "Modpack" -version "1.0.4.0" -company "MaxitoDev"
-   ```
-
-   **Opción C - Usar el archivo .BAT** (Para pruebas):
-   - Doble clic en `Ejecutar_Instalador.bat`
-   **Opción C - Ejecutar directamente**:
-   - Clic derecho en `Installer.ps1` → **Ejecutar con PowerShell**
-
-3. **Ejecuta `2_Crear_ZIP.bat` para crear el archivo de distribución
-   - Comparte el archivo .zip con tus usuarios
-   - O sube el .zip a Google Drive, Mega, MediaFire, etc.en un .zip
-   - Comparte con tus usuarios
-
-### Para Usuarios que instalan el Modpack
-
-1. DescompriModpack.exe` (o `Ejecutar_Instalador.bat`)
-3. Sigue las instrucciones en pantalla
-4. Abre Minecraft Launcher y selecciona el perfil **"Modpack - by MaxitoDev - Minecraft 1.21.11"**
-5. ¡A jugar! Los resource packs y shaders ya están activados automáticamentela
-4. ¡Abre Minecraft Launcher y juega!
+---
 
 ## 📁 Estructura del Proyecto
 
 ```
 mcpack/
-│🎮 Modpack.exe                # Instalador compilado
-├── 🚀 Ejecutar_Instalador.bat    # Lanzador alternativo
 │
-├── 🔧 1_Compilar_Instalador.bat  # Compila el .exe
-├── 📦 2_Crear_ZIP.bat            # Crea el archivo de distribución
-├── ⚡ 3_Build_Completo.bat       # Build automático completo
+├── 📁 Client/                        # Archivos del cliente (Windows)
+│   ├── Installer.ps1                 # Instalador PowerShell
+│   ├── 1_Compilar_Instalador.bat     # Compila el .exe
+│   ├── 2_Crear_ZIP.bat               # Crea el paquete de distribución
+│   ├── 3_Build_Completo.bat          # Build completo automático
+│   ├── Ejecutar_Instalador.bat      # Ejecuta el instalador
+│   ├── INSTRUCCIONES.txt             # Instrucciones para crear el .exe
+│   └── LEEME.txt                     # Manual para usuarios
 │
-├── 📄 INSTRUCCIONES.txt          # Guía rápida
-├── 📖 README.md                  # Este archivo
-├── 🚫 .gitignore                 # Configuración de Git
+├── 📁 Server/                        # Archivos del servidor (Linux)
+│   ├── install.sh                    # Instalador para Linux
+│   ├── 1_build_server.sh             # Build del servidor (Linux)
+│   ├── 1_build_server.bat            # Build del servidor (Windows)
+│   └── LEEME_SERVIDOR.txt            # Manual para servidores
 │
-├── 📁 installer/                 # Coloca aquí el instalador de NeoForge
+├── 📁 installer/                     # Instalador de NeoForge
 │   └── neoforge-21.11.37-beta-installer.jar
 │
-├── 📁 mods/                      # Coloca aquí todos los mods (.jar)
-│   └── (82 mods incluidos)
+├── 📁 mods/                          # Mods del modpack
+│   └── *.jar (82+ mods)
 │
-├── 📁 resourcepacks/             # Resource packs (.zip)
+├── 📁 resourcepacks/                 # Paquetes de recursos
 │   ├── Alacrity.zip
 │   └── FreshAnimations_v1.10.3.zip
 │
-├── 📁 shaderpacks/               # Shader packs (.zip)
+├── 📁 shaderpacks/                   # Paquetes de shaders
 │   ├── Bliss_v2.1.2.zip
 │   ├── ComplementaryReimagined_r5.6.1.zip
 │   └── ComplementaryUnbound_r5.6.1.zip
 │
-└── 📁 config/                    # Configuraciones personalizadas
+├── 📁 config/                        # Configuraciones personalizadas
+│   └── modpack-info.txt
 │
-└── 📁 config/                    # Configuraciones personalizadas (opcional)
-    └── ...
+├── .gitignore                        # Archivos ignorados por Git
+└── README.md                         # Este archivo
 ```
 
-## ✨ Características
+---
 
-El instalador automáticamente:
-**Activa automáticamente los resource packs** en el juego
-- ✅ **Activa automáticamente el shader** en el juego
-- ✅ **Renombra el perfil del launcher** a un nombre personalizado
-- ✅ **Cambia el icono** del perfil en el launcher
-- ✅ 
+## 🎯 Uso Rápido
+
+### 🖥️ Para Crear el Instalador del Cliente (Windows)
+
+   - `installer/` → NeoForge installer
+   - `mods/` → Archivos .jar de mods
+   - `resourcepacks/` → Archivos .zip de resource packs
+   - `shaderpacks/` → Archivos .zip de shaders
+   - `config/` → Configuraciones personalizadas (opcional)
+
+2. **Ejecuta** `Client/3_Build_Completo.bat`
+
+3. **Comparte** el archivo `Client/Modpack-MaxitoDev-1.21.11.zip` con tus usuarios
+
+### 🐧 Para Crear el Paquete del Servidor (Linux)
+
+1. **Asegúrate** de tener los archivos en las carpetas compartidas (installer, mods, config)
+
+2. **Elige tu método de build:**
+
+   **OPCIÓN A - Windows con WSL (Recomendado):**
+   ```bash
+   cd Server
+   1_build_server.bat
+   ```
+   
+   **OPCIÓN B - Windows con PowerShell (Sin WSL):**
+   ```bash
+   cd Server
+   1_build_server_powershell.bat
+   ```
+   *Crea un .zip en lugar de .tar.gz*
+   
+   **OPCIÓN C - Desde Linux:**
+   ```bash
+   cd Server
+   chmod +x 1_build_server.sh
+   ./1_build_server.sh
+   ```
+
+3. **Distribuye** el archivo generado en `Server/`
+
+---
+
+## 📖 Guías Detalladas
+
+### Para Creadores de Modpacks
+
+#### Cliente (Windows)
+
+Ver: `Client/INSTRUCCIONES.txt`
+
+**Pasos rápidos:**
+```bash
+# 1. Compilar el instalador a .exe
+Client/1_Compilar_Instalador.bat
+
+# 2. Crear el archivo ZIP de distribución
+Client/2_Crear_ZIP.bat
+
+# O hacer todo en un solo paso:
+Client/3_Build_Completo.bat
+```
+
+**Requisitos previos:**
+- PowerShell 5.1+
+- Módulo PS2EXE instalado: `Install-Module -Name ps2exe -Scope CurrentUser`
+
+#### Servidor (Linux)
+
+Ver: `Server/LEEME_SERVIDOR.txt`
+
+**En Linux:**
+```bash
+cd Server
+chmod +x 1_build_server.sh
+./1_build_server.sh
+```
+
+**En Windows (con WSL):**
+```bash
+Server\1_build_server.bat
+```
+
+### Para Usuarios Finales
+
+#### Instalar el Cliente
+
+Ver: `Client/LEEME.txt`
+
+**Requisitos:**
+- Windows 7 o superior
+- Java 17+ ([Descargar](https://adoptium.net/))
+- Minecraft Java Edition
+
+**Pasos:**
+1. Descomprimir el archivo ZIP
+2. Ejecutar `Modpack.exe`
+3. Seguir las instrucciones
+4. Abrir Minecraft Launcher y seleccionar el perfil
+
+#### Instalar el Servidor
+
+Ver: `Server/LEEME_SERVIDOR.txt`
+
+**Requisitos:**
+- VPS Linux (Ubuntu/Debian/CentOS)
+- 4GB+ RAM (recomendado 6-8GB)
+- Java 17+
+- Puerto 25565 abierto
+
+**Pasos:**
+1. Subir el archivo .tar.gz al VPS
+2. Descomprimir: `tar -xzf Modpack-Server-MaxitoDev-1.21.11.tar.gz`
+3. Ejecutar: `cd Server && chmod +x install.sh && ./install.sh`
+4. Iniciar: `cd minecraft-server && ./start.sh`
+
+---
+
+## ⚙️ Características del Instalador
+
+### Cliente (Windows)
+
 - ✅ Verifica que Java esté instalado
-- ✅ Instala NeoForge ejecutando su instalador oficial
-- ✅ Copia todos los mods a `.minecraft/mods`
-- ✅ Copia los resource packs a `.minecraft/resourcepacks`
-- ✅ Copia los shader packs a `.minecraft/shaderpacks`
-- ✅ Copia configuraciones personalizadas a `.minecraft/config`
-- ✅ Muestra mensajes informativos y coloridos
-- ✅ Detecta y reporta errores
+- ✅ Instala NeoForge automáticamente
+- ✅ Copia mods a `.minecraft/mods`
+- ✅ Copia resource packs a `.minecraft/resourcepacks`
+- ✅ Copia shaders a `.minecraft/shaderpacks`
+- ✅ **Activa automáticamente los resource packs en el juego**
+- ✅ **Activa automáticamente el shader en el juego**
+- ✅ **Renombra el perfil del launcher**
+- ✅ Interfaz colorida e informativa
+
+### Servidor (Linux)
+
+- ✅ Verifica que Java 17+ esté instalado
+- ✅ Instala NeoForge en modo servidor
+- ✅ Copia mods compatibles con servidor
+- ✅ Copia configuraciones personalizadas
+- ✅ Crea `server.properties` preconfigurado
+- ✅ Acepta EULA automáticamente
+- ✅ Genera scripts de inicio/detención optimizados
+- ✅ Incluye flags de optimización (Aikar's flags)
+- ✅ Genera documentación completa
+
+---
 
 ## 🔧 Personalización
 
-### Cambiar la ruta de instalación de Minecraft
+### Cambiar el Nombre del Perfil del Launcher (Cliente)
 
-Edita [Installer.ps1](Installer.ps1) y modifica el parámetro `$MinecraftPath`:
+Edita `Client/Installer.ps1`:
 
 ```powershell
-param(
-    [string]$MinecraftPath = "C:\TuRutaPersonalizada\.minecraft"
-)
+$customName = "TU NOMBRE PERSONALIZADO"
 ```
 
-O ejecuta el script con parámetros:Modpack.exe" -iconFile ".\icon.ico"
-   ```
+### Cambiar la Configuración del Servidor
 
-### Cambiar el nombre del perfil en el launcher
+Edita el archivo generado `minecraft-server/server.properties`:
 
-Edita [Installer.ps1](Installer.ps1) y busca esta línea:
-```powershell
-$customName = "Modpack - by MaxitoDev - Minecraft 1.21.11"
-```
-Cámbiala por el nombre que prefieras.
-```powershell
-.\Installer.ps1 -MinecraftPath "C:\MiMinecraft"
+```properties
+max-players=20              # Jugadores máximos
+view-distance=10            # Distancia de visión
+difficulty=normal           # Dificultad
+gamemode=survival          # Modo de juego
+motd=Tu mensaje MOTD       # Mensaje del servidor
 ```
 
-### Añadir un icono al ejecutable
+### Ajustar RAM del Servidor
 
-1. Coloca un archivo `icon.ico` en la carpeta raíz
-2. Al crear el .exe con PS2EXE, añade el parámetro:
+Edita el archivo generado `minecraft-server/start.sh`:
+
+```bash
+# Para VPS de 4GB
+java -Xms2G -Xmx3G ...
+
+# Para VPS de 8GB
+java -Xms4G -Xmx6G ...
+```
+
+---
+
+## 🚀 Control de Versiones con Git
+
+El proyecto está configurado con `.gitignore` para excluir archivos binarios grandes:
+
+**NO se suben a Git:**
+- ❌ Archivos `.jar`, `.zip`, `.exe`
+- ❌ Logs y archivos temporales
+- ❌ Paquetes compilados
+
+**SÍ se suben a Git:**
+- ✅ Scripts (.ps1, .bat, .sh)
+- ✅ Documentación (.txt, .md)
+- ✅ Configuraciones
+
+**Mantener estructura de carpetas:**
+```bash
+# Las carpetas vacías se mantienen con .gitkeep
+git add mods/.gitkeep
+git add resourcepacks/.gitkeep
+git add shaderpacks/.gitkeep
+git add installer/.gitkeep
+```
+
+---
+
+## 🐛 Problemas Comunes
+
+### Cliente (Windows)
+
+**"Java no está instalado"**
+- Descargar e instalar desde [Adoptium](https://adoptium.net/)
+
+**El instalador no abre**
+- Ejecutar como Administrador
+- Permitir en el antivirus temporalmente
+
+**Crash al iniciar Minecraft**
+- Aumentar RAM en el perfil del launcher (6-8GB recomendado)
+
+### Servidor (Linux)
+
+**"Cannot allocate memory"**
+- Reducir RAM en `start.sh`: `-Xmx2G`
+
+**Puerto en uso**
+- Cambiar `server-port` en `server.properties`
+
+**No puedo conectarme**
+- Verificar firewall: `sudo ufw allow 25565/tcp`
+- Verificar que el servidor esté corriendo: `ps aux | grep java`
+
+---
+
+## 📝 TODO / Roadmap
+
+- [ ] Soporte para macOS
+- [ ] Instalador GUI con interfaz gráfica
+- [ ] Sistema de actualizaciones automáticas
+- [ ] Panel web de administración del servidor
+- [ ] Soporte para Docker
+
+---
+
+## 📜 Licencia
+
+Este proyecto es de código abierto. Puedes usarlo, modificarlo y distribuirlo libremente.
+
+---
+
+## 👤 Autor
+
+**MaxitoDev**
+
+¿Problemas? ¿Sugerencias? ¡Contacta!
+
+---
+
+## 🙏 Créditos
+
+- **NeoForge Team** - Por el mod loader
+- **Comunidad de modders** - Por los increíbles mods
+- **Aikar** - Por las flags de optimización del servidor
+
+---
+
+**¡Disfruta tu modpack!** 🎮✨
    ```powershell
    Invoke-PS2EXE -inputFile ".\Installer.ps1" -outputFile ".\InstaladorModpack.exe" -iconFile ".\icon.ico"
    ```

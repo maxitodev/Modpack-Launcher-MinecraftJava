@@ -1,0 +1,132 @@
+═══════════════════════════════════════════════════════════════════
+  ESTRUCTURA DEL PROYECTO - MODPACK ORGANIZADO
+  Cliente (Windows) y Servidor (Linux)
+═══════════════════════════════════════════════════════════════════
+
+📁 mcpack/
+│
+├── 📁 Client/                        ← CLIENTE WINDOWS
+│   ├── Installer.ps1                 # Instalador PowerShell
+│   ├── 1_Compilar_Instalador.bat     # Compilar a .exe
+│   ├── 2_Crear_ZIP.bat               # Crear paquete distribución
+│   ├── 3_Build_Completo.bat          # Build automático
+│   ├── Ejecutar_Instalador.bat      # Ejecutar sin compilar
+│   ├── INSTRUCCIONES.txt             # Guía para creadores
+│   ├── LEEME.txt                     # Manual para usuarios
+│   └── README_CLIENT.md              # Documentación del cliente
+│   │
+│   └── Modpack.exe                   # (Se genera aquí)
+│   └── Modpack-MaxitoDev-1.21.11.zip # (Se genera aquí)
+│
+├── 📁 Server/                        ← SERVIDOR LINUX
+│   ├── install.sh                    # Instalador Linux
+│   ├── 1_build_server.sh             # Build (Linux)
+│   ├── 1_build_server.bat            # Build (Windows WSL)
+│   ├── 1_build_server_powershell.bat # Build (Windows sin WSL)
+│   ├── 1_build_server.ps1            # Script PowerShell
+│   ├── LEEME_SERVIDOR.txt            # Manual para servidores
+│   └── README_SERVER.md              # Documentación del servidor
+│   │
+│   └── Modpack-Server-MaxitoDev-1.21.11.tar.gz  # (Se genera aquí)
+│   └── Modpack-Server-MaxitoDev-1.21.11.zip     # (PowerShell genera .zip)
+│
+├── 📁 installer/                     ← COMPARTIDO
+│   ├── .gitkeep
+│   ├── README_INSTALLER.txt
+│   └── neoforge-21.11.37-beta-installer.jar  (Colocar aquí)
+│
+├── 📁 mods/                          ← COMPARTIDO
+│   ├── .gitkeep
+│   ├── README_MODS.txt
+│   └── *.jar                         (Colocar mods aquí)
+│
+├── 📁 resourcepacks/                 ← COMPARTIDO
+│   ├── .gitkeep
+│   ├── README_RESOURCEPACKS.txt
+│   └── *.zip                         (Colocar resource packs aquí)
+│
+├── 📁 shaderpacks/                   ← COMPARTIDO
+│   ├── .gitkeep
+│   ├── README_SHADERPACKS.txt
+│   └── *.zip                         (Colocar shaders aquí)
+│
+├── 📁 config/                        ← COMPARTIDO
+│   └── modpack-info.txt              (Configuraciones personalizadas)
+│
+├── .gitignore                        # Configuración Git
+└── README.md                         # Documentación principal
+
+═══════════════════════════════════════════════════════════════════
+  FLUJO DE TRABAJO
+═══════════════════════════════════════════════════════════════════
+
+1. PREPARAR ARCHIVOS:
+   ────────────────────
+   Coloca tus archivos en las carpetas COMPARTIDAS:
+   - installer/  → neoforge-*.jar
+   - mods/       → *.jar
+   - resourcepacks/ → *.zip
+   - shaderpacks/   → *.zip
+   - config/     → Archivos de configuración (opcional)
+
+2. CREAR INSTALADOR CLIENTE (Windows):
+   ────────────────────────────────────
+   cd Client
+   3_Build_Completo.bat
+   
+   Resultado: Modpack-MaxitoDev-1.21.11.zip
+
+3. CREAR PAQUETE SERVIDOR (Linux):
+   ─────────────────────────────────
+   OPCIÓN A - Windows con WSL:
+   cd Server
+   1_build_server.bat
+   
+   OPCIÓN B - Windows sin WSL:
+   cd Server
+   1_build_server_powershell.bat
+   
+   OPCIÓN C - Linux:
+   cd Server
+   ./1_build_server.sh
+   
+   Resultado: Archivo en Server/ (.tar.gz o .zip)
+
+4. DISTRIBUIR:
+   ────────────
+   - Cliente: Comparte Client/Modpack-MaxitoDev-1.21.11.zip
+   - Servidor: Comparte Server/Modpack-Server-MaxitoDev-1.21.11.tar.gz
+
+═══════════════════════════════════════════════════════════════════
+  VENTAJAS DE ESTA ESTRUCTURA
+═══════════════════════════════════════════════════════════════════
+
+✅ Separación clara entre Cliente y Servidor
+✅ Recursos compartidos (evita duplicación)
+✅ Scripts de build organizados por plataforma
+✅ Fácil mantenimiento y actualización
+✅ Compatible con Git (archivos binarios excluidos)
+✅ Documentación específica para cada componente
+✅ Flujo de trabajo profesional
+
+═══════════════════════════════════════════════════════════════════
+  COMANDOS RÁPIDOS
+═══════════════════════════════════════════════════════════════════
+
+# Build completo del cliente
+cd Client && 3_Build_Completo.bat
+
+# Build del servidor (Linux)
+cd Server && chmod +x *.sh && ./1_build_server.sh
+
+# Build del servidor (Windows WSL)
+cd Server && 1_build_server.bat
+
+# Probar instalador del cliente
+cd Client && Ejecutar_Instalador.bat
+
+═══════════════════════════════════════════════════════════════════
+
+Ver README.md para documentación completa.
+
+═══════════════════════════════════════════════════════════════════
