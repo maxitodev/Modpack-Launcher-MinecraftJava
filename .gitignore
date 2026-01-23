@@ -6,13 +6,11 @@
 
 # Carpetas con contenido binario
 mods/*.jar
-resourcepacks/*.zip
 shaderpacks/*.zip
 installer/*.jar
 
 # Mantener las carpetas vacias (crear archivos .gitkeep)
 !mods/.gitkeep
-!resourcepacks/.gitkeep
 !shaderpacks/.gitkeep
 !installer/.gitkeep
 
