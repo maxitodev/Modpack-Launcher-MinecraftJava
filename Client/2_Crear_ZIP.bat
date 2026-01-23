@@ -9,6 +9,7 @@ echo ================================================================
 echo.
 
 REM Crear el archivo ZIP con todos los componentes necesarios
+REM Las carpetas deben estar al mismo nivel que Modpack.exe dentro del ZIP
 powershell.exe -ExecutionPolicy Bypass -Command "Compress-Archive -Path 'Modpack.exe', '..\installer', '..\mods', '..\resourcepacks', '..\shaderpacks', '..\config', 'LEEME.txt' -DestinationPath '.\Modpack-MaxitoDev-1.21.11.zip' -Force"
 
 if %ERRORLEVEL% EQU 0 (

@@ -16,11 +16,62 @@ if ($PSScriptRoot) {
     $ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {
     # Ejecutando como .exe compilado
-    $ScriptPath = Split-Path -Parent ([System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName)
+    # Primero intentar con el directorio actual de trabajo (donde se ejecutó el exe)
+    $ScriptPath = (Get-Location).Path
+    
+    # Verificar si las carpetas necesarias existen en esta ubicación
+    $testPaths = @("installer", "mods", "resourcepacks", "shaderpacks", "config")
+    $foundAll = $true
+    foreach ($testPath in $testPaths) {
+        if (-not (Test-Path (Join-Path $ScriptPath $testPath))) {
+            $foundAll = $false
+            break
+        }
+    }
+    
+    # Si no se encuentran en el directorio actual, intentar con la ubicación del exe
+    if (-not $foundAll) {
+        try {
+            $exePath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
+            $ScriptPath = Split-Path -Parent $exePath
+        } catch {
+            # Si todo falla, usar el directorio actual
+            $ScriptPath = (Get-Location).Path
+        }
+    }
 }
 
-# Detectar la ruta padre (donde están mods, installer, etc.)
-$ParentPath = Split-Path -Parent $ScriptPath
+# Detectar la ruta base (donde están mods, installer, etc.)
+# Cuando se distribuye en ZIP, las carpetas están al mismo nivel que el ejecutable
+# En desarrollo, las carpetas están en el directorio padre
+$ParentPath = $ScriptPath
+
+# Verificar si las carpetas existen en el directorio actual
+$testPaths = @("installer", "mods", "resourcepacks", "shaderpacks", "config")
+$foundInCurrent = $true
+foreach ($testPath in $testPaths) {
+    if (-not (Test-Path (Join-Path $ParentPath $testPath))) {
+        $foundInCurrent = $false
+        break
+    }
+}
+
+# Si no están en el directorio actual, buscar en el directorio padre (para desarrollo)
+if (-not $foundInCurrent) {
+    $ParentPathTest = Split-Path -Parent $ScriptPath
+    $foundInParent = $true
+    foreach ($testPath in $testPaths) {
+        if (-not (Test-Path (Join-Path $ParentPathTest $testPath))) {
+            $foundInParent = $false
+            break
+        }
+    }
+    
+    # Si se encuentran en el directorio padre, usar esa ruta
+    if ($foundInParent) {
+        $ParentPath = $ParentPathTest
+    }
+}
 
 # Colores y formato
 $Host.UI.RawUI.WindowTitle = "Instalador de Modpack"
@@ -54,20 +105,46 @@ function Test-JavaInstalled {
 function Install-NeoForge {
     Write-ColorText "[1/4] Instalando NeoForge..." -Color Yellow
     
-    $neoforgeJar = Get-ChildItem -Path "$ParentPath\installer" -Filter "neoforge-*.jar" | Select-Object -First 1
+    $installerPath = Join-Path $ParentPath "installer"
+    
+    # Verificar que la carpeta installer existe
+    if (-not (Test-Path $installerPath)) {
+        Write-ColorText "ERROR: No se encuentra la carpeta 'installer'" -Color Red
+        Write-ColorText "Ruta esperada: $installerPath" -Color Gray
+        Write-ColorText "" -Color White
+        Write-ColorText "La estructura esperada es:" -Color Yellow
+        Write-ColorText "  Instalador.exe" -Color Gray
+        Write-ColorText "  installer\" -Color Gray
+        Write-ColorText "  mods\" -Color Gray
+        Write-ColorText "  resourcepacks\" -Color Gray
+        Write-ColorText "  shaderpacks\" -Color Gray
+        Write-ColorText "  config\" -Color Gray
+        Write-ColorText "" -Color White
+        Write-ColorText "Por favor, asegurate de que todas las carpetas esten al mismo nivel que el instalador" -Color Red
+        return $false
+    }
+    
+    $neoforgeJar = Get-ChildItem -Path $installerPath -Filter "neoforge-*.jar" -ErrorAction SilentlyContinue | Select-Object -First 1
     
     if (-not $neoforgeJar) {
         Write-ColorText "ERROR: No se encontro el instalador de NeoForge en la carpeta 'installer'" -Color Red
+        Write-ColorText "Ruta buscada: $installerPath" -Color Gray
         Write-ColorText "Por favor, coloca el archivo .jar de NeoForge en la carpeta 'installer'" -Color Red
         return $false
     }
     
     Write-ColorText "  Encontrado: $($neoforgeJar.Name)" -Color Green
-    Write-ColorText "  Ejecutando instalador de NeoForge..." -Color Gray
+    Write-ColorText "  Abriendo instalador de NeoForge..." -Color Gray
+    Write-ColorText "" -Color White
+    Write-ColorText "  Se abrira la interfaz grafica del instalador de NeoForge." -Color Yellow
+    Write-ColorText "  Por favor, completa la instalacion en la ventana que se abrira." -Color Yellow
+    Write-ColorText "  Asegurate de seleccionar 'Install client' y finalizar la instalacion." -Color Yellow
+    Write-ColorText "  Este instalador esperara a que termines..." -Color Yellow
+    Write-ColorText "" -Color White
     
     try {
-        # Ejecutar el instalador de NeoForge con parametro --installClient
-        $process = Start-Process -FilePath "java" -ArgumentList "-jar", "`"$($neoforgeJar.FullName)`"", "--installClient" -Wait -PassThru -NoNewWindow
+        # Ejecutar el instalador de NeoForge con interfaz grafica
+        $process = Start-Process -FilePath "java" -ArgumentList "-jar", "`"$($neoforgeJar.FullName)`"" -Wait -PassThru
         
         if ($process.ExitCode -eq 0) {
             Write-ColorText "  OK - NeoForge instalado correctamente" -Color Green
@@ -75,7 +152,8 @@ function Install-NeoForge {
             Start-Sleep -Seconds 5
             return $true
         } else {
-            Write-ColorText "  ERROR: El instalador de NeoForge finalizo con errores" -Color Red
+            Write-ColorText "  ERROR: El instalador de NeoForge finalizo con errores (Codigo: $($process.ExitCode))" -Color Red
+            Write-ColorText "  Si cerraste el instalador sin completar la instalacion, vuelve a ejecutar este instalador" -Color Yellow
             return $false
         }
     } catch {
@@ -409,6 +487,10 @@ Write-ColorText "OK - Java detectado" -Color Green
 # Mostrar ruta de instalacion
 Write-ColorText "`nRuta de instalacion de Minecraft:" -Color White
 Write-ColorText "  $MinecraftPath" -Color Cyan
+
+# Mostrar ruta de los archivos del modpack (para debug)
+Write-ColorText "`nRuta de los archivos del modpack:" -Color White
+Write-ColorText "  $ParentPath" -Color Cyan
 
 Write-Host "`nDesea continuar con la instalacion? (S/N): " -NoNewline
 $response = Read-Host
