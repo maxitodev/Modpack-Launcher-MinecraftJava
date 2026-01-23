@@ -26,8 +26,7 @@ $RequiredItems = @(
     "$ScriptDir\install.sh",
     "$ParentDir\installer",
     "$ParentDir\mods",
-    "$ParentDir\config",
-    "$ParentDir\plugins"
+    "$ParentDir\config"
 )
 
 $AllPresent = $true
@@ -67,10 +66,6 @@ try {
     Write-ColorText "  Copiando config/..." -Color Gray
     $configDest = Join-Path $TempDir "config"
     Copy-Item -Path "$ParentDir\config" -Destination $configDest -Recurse -Force
-    
-    Write-ColorText "  Copiando plugins/..." -Color Gray
-    $pluginsDest = Join-Path $TempDir "plugins"
-    Copy-Item -Path "$ParentDir\plugins" -Destination $pluginsDest -Recurse -Force
     
     Write-ColorText "  Copiando archivos del servidor..." -Color Gray
     $serverDest = Join-Path $TempDir "Server"
