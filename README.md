@@ -11,9 +11,6 @@ Sistema profesional de distribución de modpacks de Minecraft con soporte para *
 ## 📋 Contenido del Proyecto
 
 Este proyecto incluye:
-- ✅ **82+ mods** optimizados para cliente
-- ✅ **Resource Packs:** Alacrity, FreshAnimations
-- ✅ **Shaders:** Bliss, Complementary Reimagined, Complementary Unbound
 - ✅ **Instalador automático para Windows** (Cliente)
 - ✅ **Instalador automático para Linux** (Servidor VPS)
 - ✅ **Scripts de build** para crear paquetes de distribución
