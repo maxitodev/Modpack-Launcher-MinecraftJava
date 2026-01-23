@@ -322,9 +322,18 @@ function Configure-GameSettings {
     # Resource packs especificos a activar
     $requiredPacks = @("Alacrity.zip")
     
-    # Obtener shader instalado (usar el primero encontrado)
+    # Shader especifico a habilitar
+    $requiredShader = "Bliss_v2.1.2_(Chocapic13_Shaders_edit).zip"
     $shaderpacksPath = Join-Path $MinecraftPath "shaderpacks"
-    $installedShader = Get-ChildItem -Path $shaderpacksPath -Filter "*.zip" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Name
+    $installedShader = $null
+    
+    # Verificar que el shader requerido este instalado
+    $shaderPath = Join-Path $shaderpacksPath $requiredShader
+    if (Test-Path $shaderPath) {
+        $installedShader = $requiredShader
+    } else {
+        Write-ColorText "  Advertencia: No se encontro el shader requerido: $requiredShader" -Color Yellow
+    }
     
     # Leer options.txt existente o crear nuevo
     $optionsContent = @()
