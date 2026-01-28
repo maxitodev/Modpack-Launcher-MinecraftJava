@@ -174,6 +174,24 @@ function Copy-Mods {
         New-Item -ItemType Directory -Path $modsDestination -Force | Out-Null
     }
     
+    # Eliminar mods existentes primero
+    Write-ColorText "  Eliminando mods existentes..." -Color Gray
+    $existingMods = Get-ChildItem -Path $modsDestination -Filter "*.jar" -ErrorAction SilentlyContinue
+    if ($existingMods.Count -gt 0) {
+        $deleted = 0
+        foreach ($existingMod in $existingMods) {
+            try {
+                Remove-Item -Path $existingMod.FullName -Force
+                $deleted++
+            } catch {
+                Write-ColorText "  Advertencia: No se pudo eliminar $($existingMod.Name): $_" -Color Yellow
+            }
+        }
+        Write-ColorText "  OK - $deleted mods anteriores eliminados" -Color Green
+    } else {
+        Write-ColorText "  No hay mods anteriores para eliminar" -Color Gray
+    }
+    
     # Obtener lista de mods
     $mods = Get-ChildItem -Path $modsSource -Filter "*.jar" -ErrorAction SilentlyContinue
     
@@ -210,6 +228,24 @@ function Copy-ResourcePacks {
         New-Item -ItemType Directory -Path $resourcepacksDestination -Force | Out-Null
     }
     
+    # Eliminar resource packs existentes primero
+    Write-ColorText "  Eliminando resource packs existentes..." -Color Gray
+    $existingPacks = Get-ChildItem -Path $resourcepacksDestination -Filter "*.zip" -ErrorAction SilentlyContinue
+    if ($existingPacks.Count -gt 0) {
+        $deleted = 0
+        foreach ($existingPack in $existingPacks) {
+            try {
+                Remove-Item -Path $existingPack.FullName -Force
+                $deleted++
+            } catch {
+                Write-ColorText "  Advertencia: No se pudo eliminar $($existingPack.Name): $_" -Color Yellow
+            }
+        }
+        Write-ColorText "  OK - $deleted resource packs anteriores eliminados" -Color Green
+    } else {
+        Write-ColorText "  No hay resource packs anteriores para eliminar" -Color Gray
+    }
+    
     # Obtener lista de resource packs
     $resourcepacks = Get-ChildItem -Path $resourcepacksSource -Filter "*.zip" -ErrorAction SilentlyContinue
     
@@ -244,6 +280,24 @@ function Copy-ShaderPacks {
     # Crear carpeta de destino si no existe
     if (-not (Test-Path $shaderpacksDestination)) {
         New-Item -ItemType Directory -Path $shaderpacksDestination -Force | Out-Null
+    }
+    
+    # Eliminar shader packs existentes primero
+    Write-ColorText "  Eliminando shader packs existentes..." -Color Gray
+    $existingShaders = Get-ChildItem -Path $shaderpacksDestination -Filter "*.zip" -ErrorAction SilentlyContinue
+    if ($existingShaders.Count -gt 0) {
+        $deleted = 0
+        foreach ($existingShader in $existingShaders) {
+            try {
+                Remove-Item -Path $existingShader.FullName -Force
+                $deleted++
+            } catch {
+                Write-ColorText "  Advertencia: No se pudo eliminar $($existingShader.Name): $_" -Color Yellow
+            }
+        }
+        Write-ColorText "  OK - $deleted shader packs anteriores eliminados" -Color Green
+    } else {
+        Write-ColorText "  No hay shader packs anteriores para eliminar" -Color Gray
     }
     
     # Obtener lista de shader packs
@@ -575,10 +629,6 @@ if ($success) {
     Write-ColorText "  2. Ve a 'Mas opciones' o 'More Options'" -Color Gray
     Write-ColorText "  3. En 'Argumentos JVM' cambia -Xmx8G por -Xmx10G o -Xmx12G" -Color Gray
     Write-Host ""
-    Write-ColorText "NO OLVIDES - Activar Resource Packs:" -Color Yellow
-    Write-ColorText "  1. Inicia el juego" -Color Gray
-    Write-ColorText "  2. Ve a Opciones → Resource Packs" -Color Gray
-    Write-ColorText "  3. Activa: Alacrity" -Color Gray
 } else {
     Write-ColorText "ERROR - LA INSTALACION FINALIZO CON ERRORES" -Color Red
     Write-Host ""

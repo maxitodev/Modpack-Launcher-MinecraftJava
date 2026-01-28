@@ -30,7 +30,7 @@ echo [2/2] Creando archivo ZIP...
 echo.
 
 REM Crear el ZIP
-powershell.exe -ExecutionPolicy Bypass -Command "Compress-Archive -Path 'Modpack.exe', '..\installer', '..\mods', '..\resourcepacks', '..\shaderpacks', '..\config', 'LEEME.txt' -DestinationPath '.\Modpack-MaxitoDev-1.21.11.zip' -Force"
+powershell.exe -ExecutionPolicy Bypass -Command "Compress-Archive -Path 'Modpack.exe', '..\installer', '..\mods', '..\resourcepacks', '..\shaderpacks', '..\config', 'LEEME.txt' -DestinationPath '.\Modpack-MinecraftServer.zip' -Force"
 
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: No se pudo crear el ZIP
@@ -44,6 +44,6 @@ echo ================================================================
 echo    BUILD COMPLETADO EXITOSAMENTE!
 echo ================================================================
 echo.
-echo Archivo listo para distribuir: Modpack-MaxitoDev-1.21.11.zip
+echo Archivo listo para distribuir: Modpack-MinecraftServer.zip
 echo.
 pause
