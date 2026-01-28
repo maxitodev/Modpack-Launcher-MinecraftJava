@@ -181,7 +181,7 @@ function Copy-Mods {
         $deleted = 0
         foreach ($existingMod in $existingMods) {
             try {
-                Remove-Item -Path $existingMod.FullName -Force
+                Remove-Item -LiteralPath $existingMod.FullName -Force
                 $deleted++
             } catch {
                 Write-ColorText "  Advertencia: No se pudo eliminar $($existingMod.Name): $_" -Color Yellow
@@ -205,7 +205,7 @@ function Copy-Mods {
     $copied = 0
     foreach ($mod in $mods) {
         try {
-            Copy-Item -Path $mod.FullName -Destination $modsDestination -Force
+            Copy-Item -LiteralPath $mod.FullName -Destination $modsDestination -Force
             $copied++
             Write-ColorText "  OK - $($mod.Name)" -Color Green
         } catch {
@@ -235,7 +235,7 @@ function Copy-ResourcePacks {
         $deleted = 0
         foreach ($existingPack in $existingPacks) {
             try {
-                Remove-Item -Path $existingPack.FullName -Force
+                Remove-Item -LiteralPath $existingPack.FullName -Force
                 $deleted++
             } catch {
                 Write-ColorText "  Advertencia: No se pudo eliminar $($existingPack.Name): $_" -Color Yellow
@@ -259,7 +259,7 @@ function Copy-ResourcePacks {
     $copied = 0
     foreach ($pack in $resourcepacks) {
         try {
-            Copy-Item -Path $pack.FullName -Destination $resourcepacksDestination -Force
+            Copy-Item -LiteralPath $pack.FullName -Destination $resourcepacksDestination -Force
             $copied++
             Write-ColorText "  OK - $($pack.Name)" -Color Green
         } catch {
@@ -289,7 +289,7 @@ function Copy-ShaderPacks {
         $deleted = 0
         foreach ($existingShader in $existingShaders) {
             try {
-                Remove-Item -Path $existingShader.FullName -Force
+                Remove-Item -LiteralPath $existingShader.FullName -Force
                 $deleted++
             } catch {
                 Write-ColorText "  Advertencia: No se pudo eliminar $($existingShader.Name): $_" -Color Yellow
@@ -313,7 +313,7 @@ function Copy-ShaderPacks {
     $copied = 0
     foreach ($pack in $shaderpacks) {
         try {
-            Copy-Item -Path $pack.FullName -Destination $shaderpacksDestination -Force
+            Copy-Item -LiteralPath $pack.FullName -Destination $shaderpacksDestination -Force
             $copied++
             Write-ColorText "  OK - $($pack.Name)" -Color Green
         } catch {
@@ -357,7 +357,7 @@ function Copy-Configs {
                 New-Item -ItemType Directory -Path $destDir -Force | Out-Null
             }
             
-            Copy-Item -Path $config.FullName -Destination $destPath -Force
+            Copy-Item -LiteralPath $config.FullName -Destination $destPath -Force
             $copied++
         } catch {
             Write-ColorText "  ERROR copiando $($config.Name): $_" -Color Red
