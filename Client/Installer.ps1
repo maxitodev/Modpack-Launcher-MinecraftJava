@@ -1,119 +1,27 @@
+# =============================
+# CONFIGURACION DE VERSIONES
+# =============================
+# Si usas Fabric, puedes definir aqui la version de Minecraft y del loader.
+# Si dejas vacio, el instalador preguntara al usuario.
+$FabricMinecraftVersion = "1.21.11"
+$FabricLoaderVersion = "0.18.4"
+
 # ============================================
 # INSTALADOR DE MODPACK MINECRAFT - NEOFORGE
 # Autor: MaxitoDev
 # ============================================
 
-
-# Preguntar al usuario si quiere instalar en .minecraft o en una carpeta personalizada
-$defaultMinecraftPath = "$env:APPDATA\.minecraft"
-Write-Host "¿Dónde quieres instalar el modpack?" -ForegroundColor Yellow
-Write-Host "[1] En la carpeta .minecraft (recomendado para usuarios comunes)" -ForegroundColor Gray
-Write-Host "[2] En una carpeta personalizada (instancia separada)" -ForegroundColor Gray
-Write-Host "Elige una opción (1/2) y presiona Enter: " -NoNewline
-$installChoice = Read-Host
-
-if ($installChoice -eq '2') {
-    Write-Host "\nIntroduce la ruta completa donde quieres instalar el modpack:" -ForegroundColor Yellow
-    $customPath = Read-Host
-    if ([string]::IsNullOrWhiteSpace($customPath)) {
-        Write-Host "Ruta vacía, usando .minecraft por defecto." -ForegroundColor Yellow
-        $MinecraftPath = $defaultMinecraftPath
-    } else {
-        $MinecraftPath = $customPath
-    }
-} else {
-    $MinecraftPath = $defaultMinecraftPath
-}
-
-# Detectar la ruta del ejecutable/script correctamente
+# Inicializar correctamente $ScriptPath y $GameFilesPath
 if ($PSScriptRoot) {
-    # Ejecutando como script .ps1
     $ScriptPath = $PSScriptRoot
 } elseif ($MyInvocation.MyCommand.Path) {
-    # Ejecutando como script .ps1 (alternativa)
     $ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 } else {
-    # Ejecutando como .exe compilado
-    # Primero intentar con el directorio actual de trabajo (donde se ejecutó el exe)
     $ScriptPath = (Get-Location).Path
-    
-    # Verificar si las carpetas necesarias existen en esta ubicación
-    $testPaths = @("installer", "mods", "resourcepacks", "shaderpacks", "config", "defaultconfig")
-    $foundAll = $true
-    foreach ($testPath in $testPaths) {
-        if (-not (Test-Path (Join-Path $ScriptPath $testPath))) {
-            $foundAll = $false
-            break
-        }
-    }
-    
-    # Si no se encuentran en el directorio actual, intentar con la ubicación del exe
-    if (-not $foundAll) {
-        try {
-            $exePath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
-            $ScriptPath = Split-Path -Parent $exePath
-        } catch {
-            # Si todo falla, usar el directorio actual
-            $ScriptPath = (Get-Location).Path
-        }
-    }
 }
-
-
-# Usar GameFiles como nueva ruta base de los archivos fuente
 $GameFilesPath = Join-Path (Split-Path $ScriptPath -Parent) "GameFiles"
 
-
-# Verificar si las carpetas existen en GameFiles
-$testPaths = @("installer", "mods", "resourcepacks", "shaderpacks", "config", "defaultconfigs")
-$foundInGameFiles = $true
-foreach ($testPath in $testPaths) {
-    if (-not (Test-Path (Join-Path $GameFilesPath $testPath))) {
-        $foundInGameFiles = $false
-        break
-    }
-}
-if (-not $foundInGameFiles) {
-    Write-ColorText "ERROR: No se encontraron todas las carpetas necesarias en GameFiles" -Color Red
-    exit 1
-}
-function Copy-DefaultConfigs {
-    Write-ColorText "`nCopiando archivos de defaultconfig..." -Color Yellow
-    $defaultConfigSource = Join-Path $GameFilesPath "defaultconfigs"
-    $defaultConfigDestination = Join-Path $MinecraftPath "defaultconfigs"
-    # Verificar si hay archivos de defaultconfig
-    $defaultConfigs = Get-ChildItem -Path $defaultConfigSource -Recurse -File -ErrorAction SilentlyContinue
-    if ($defaultConfigs.Count -eq 0) {
-        Write-ColorText "  No hay archivos de defaultconfig para copiar" -Color Gray
-        return $true
-    }
-    # Crear carpeta de destino si no existe
-    if (-not (Test-Path $defaultConfigDestination)) {
-        New-Item -ItemType Directory -Path $defaultConfigDestination -Force | Out-Null
-    }
-    Write-ColorText "  Encontrados $($defaultConfigs.Count) archivos de defaultconfig" -Color Gray
-    $copied = 0
-    foreach ($config in $defaultConfigs) {
-        try {
-            $relativePath = $config.FullName.Substring($defaultConfigSource.Length + 1)
-            $destPath = Join-Path $defaultConfigDestination $relativePath
-            $destDir = Split-Path $destPath -Parent
-            if (-not (Test-Path $destDir)) {
-                New-Item -ItemType Directory -Path $destDir -Force | Out-Null
-            }
-            Copy-Item -LiteralPath $config.FullName -Destination $destPath -Force
-            $copied++
-        } catch {
-            Write-ColorText "  ERROR copiando $($config.Name): $_" -Color Red
-        }
-    }
-    Write-ColorText "  OK - $copied archivos de defaultconfig copiados" -Color Green
-    return $true
-}
-
-# Colores y formato
-$Host.UI.RawUI.WindowTitle = "Instalador de Modpack"
-
+# Funcion para escribir texto con color
 function Write-ColorText {
     param(
         [string]$Text,
@@ -121,6 +29,8 @@ function Write-ColorText {
     )
     Write-Host $Text -ForegroundColor $Color
 }
+
+$Host.UI.RawUI.WindowTitle = "Instalador de Modpack - MaxitoDev"
 
 function Write-Header {
     Clear-Host
@@ -130,6 +40,83 @@ function Write-Header {
     Write-ColorText "================================================================" -Color Cyan
     Write-Host ""
 }
+
+# ============================================
+# SELECCION DE RUTA DE INSTALACION
+# ============================================
+Write-Header
+$defaultMinecraftPath = Join-Path $env:APPDATA ".minecraft"
+
+Write-ColorText "Selecciona la carpeta de destino:" -Color Cyan
+Write-ColorText " [1] Instalacion por defecto ($defaultMinecraftPath)" -Color Green
+Write-ColorText " [2] Ruta personalizada (Para MultiMC, Prism, o instancias secundarias)" -Color Yellow
+Write-Host "Opcion [1]: " -NoNewline
+
+$pathSelection = Read-Host
+
+if ($pathSelection -eq "2") {
+    Write-Host "Pega la ruta completa de la carpeta de la instancia:" -ForegroundColor Yellow
+    Write-Host "(Ejemplo: C:\Juegos\PrismLauncher\instances\MiModpack\.minecraft)" -ForegroundColor DarkGray
+    $inputPath = Read-Host
+    # Eliminamos comillas por si el usuario copio la ruta como "C:\Ruta"
+    $MinecraftPath = $inputPath -replace '"', ''
+} else {
+    $MinecraftPath = $defaultMinecraftPath
+}
+
+# Validacion basica de la ruta seleccionada
+if (-not (Test-Path $MinecraftPath)) {
+    Write-ColorText "ADVERTENCIA: La carpeta destino no existe: $MinecraftPath" -Color Yellow
+    Write-Host "Deseas crearla? (S/N): " -NoNewline
+    $create = Read-Host
+    if ($create -match '^[SsYy]') {
+        New-Item -ItemType Directory -Path $MinecraftPath -Force | Out-Null
+    } else {
+        Write-ColorText "Cancelado por el usuario." -Color Red
+        exit 1
+    }
+}
+
+Write-ColorText "Ruta de instalacion configurada: $MinecraftPath" -Color Cyan
+Write-Host ""
+
+# ============================================
+# VALIDACIONES
+# ============================================
+
+if (-not $FabricMinecraftVersion -or [string]::IsNullOrWhiteSpace($FabricMinecraftVersion)) {
+    Write-ColorText "ERROR: La version de Minecraft no esta definida." -Color Red
+    exit 1
+}
+if (-not $FabricLoaderVersion -or [string]::IsNullOrWhiteSpace($FabricLoaderVersion)) {
+    Write-ColorText "ERROR: La version del loader de Fabric no esta definida." -Color Red
+    exit 1
+}
+
+$profileJson1 = Join-Path $MinecraftPath "launcher_profiles.json"
+$profileJson2 = Join-Path $MinecraftPath "launcher_profiles_microsoft_store.json"
+
+if (-not (Test-Path $profileJson1) -and -not (Test-Path $profileJson2)) {
+    if ($pathSelection -eq "2") {
+        Write-ColorText "ADVERTENCIA: No se detecto launcher_profiles.json." -Color Yellow
+        Write-ColorText "Normal en launchers externos, pero no se configurara el perfil automaticamente." -Color Gray
+    } else {
+        Write-ColorText "ERROR: No se encontro un perfil de lanzador valido." -Color Red
+        Write-ColorText "Asegurate de haber abierto Minecraft al menos una vez." -Color Yellow
+        exit 1
+    }
+}
+
+$testPaths = @("installer", "mods", "resourcepacks", "shaderpacks", "config")
+foreach ($testPath in $testPaths) {
+    if (-not (Test-Path (Join-Path $GameFilesPath $testPath))) {
+        Write-ColorText "ADVERTENCIA: No se encontro la carpeta '$testPath' en GameFiles." -Color Yellow
+    }
+}
+
+# ============================================
+# FUNCIONES
+# ============================================
 
 function Test-JavaInstalled {
     try {
@@ -141,451 +128,238 @@ function Test-JavaInstalled {
 }
 
 function Install-ModLoader {
-    Write-ColorText "[1/4] Instalando modloader..." -Color Yellow
+    Write-ColorText "[1/5] Instalando modloader..." -Color Yellow
     $installerPath = Join-Path $GameFilesPath "installer"
-    # Verificar que la carpeta installer existe
+    
     if (-not (Test-Path $installerPath)) {
         Write-ColorText "ERROR: No se encuentra la carpeta 'installer'" -Color Red
-        Write-ColorText "Ruta esperada: $installerPath" -Color Gray
-        Write-ColorText "" -Color White
-        Write-ColorText "La estructura esperada es:" -Color Yellow
-        Write-ColorText "  installer/" -Color Gray
-        Write-ColorText "  mods/" -Color Gray
-        Write-ColorText "  resourcepacks/" -Color Gray
-        Write-ColorText "  shaderpacks/" -Color Gray
-        Write-ColorText "  config/" -Color Gray
-        Write-ColorText "" -Color White
-        Write-ColorText "Por favor, asegurate de que todas las carpetas esten en GameFiles" -Color Red
         return $false
     }
-    # Buscar NeoForge y Fabric
+
     $neoforgeJar = Get-ChildItem -Path $installerPath -Filter "neoforge-*.jar" -ErrorAction SilentlyContinue | Select-Object -First 1
     $fabricJar = Get-ChildItem -Path $installerPath -Filter "fabric-installer-*.jar" -ErrorAction SilentlyContinue | Select-Object -First 1
+
     if ($neoforgeJar) {
         Write-ColorText "  Encontrado: $($neoforgeJar.Name) (NeoForge)" -Color Green
         Write-ColorText "  Abriendo instalador de NeoForge..." -Color Gray
-        Write-ColorText "" -Color White
-        Write-ColorText "  Se abrira la interfaz grafica del instalador de NeoForge." -Color Yellow
-        Write-ColorText "  Por favor, completa la instalacion en la ventana que se abrira." -Color Yellow
-        Write-ColorText "  Asegurate de seleccionar 'Install client' y finalizar la instalacion." -Color Yellow
-        Write-ColorText "  Este instalador esperara a que termines..." -Color Yellow
-        Write-ColorText "" -Color White
         try {
             $process = Start-Process -FilePath "java" -ArgumentList "-jar", "`"$($neoforgeJar.FullName)`"" -Wait -PassThru
             if ($process.ExitCode -eq 0) {
                 Write-ColorText "  OK - NeoForge instalado correctamente" -Color Green
-                Write-ColorText "  Esperando a que se cree el perfil..." -Color Gray
-                Start-Sleep -Seconds 5
+                Start-Sleep -Seconds 2
                 return $true
             } else {
-                Write-ColorText "  ERROR: El instalador de NeoForge finalizo con errores (Codigo: $($process.ExitCode))" -Color Red
-                Write-ColorText "  Si cerraste el instalador sin completar la instalacion, vuelve a ejecutar este instalador" -Color Yellow
+                Write-ColorText "  ERROR: El instalador de NeoForge finalizo con errores" -Color Red
                 return $false
             }
         } catch {
-            Write-ColorText "  ERROR: No se pudo ejecutar el instalador de NeoForge" -Color Red
-            Write-ColorText "  Detalles: $_" -Color Red
+            Write-ColorText "  ERROR ejecuntando Java: $_" -Color Red
             return $false
         }
     } elseif ($fabricJar) {
         Write-ColorText "  Encontrado: $($fabricJar.Name) (Fabric)" -Color Green
-        Write-ColorText "  Abriendo instalador de Fabric..." -Color Gray
-        Write-ColorText "" -Color White
-        Write-ColorText "  Se abrira la interfaz grafica del instalador de Fabric." -Color Yellow
-        Write-ColorText "  Por favor, completa la instalacion en la ventana que se abrira." -Color Yellow
-        Write-ColorText "  Asegurate de seleccionar 'Install client' y finalizar la instalacion." -Color Yellow
-        Write-ColorText "  Este instalador esperara a que termines..." -Color Yellow
-        Write-ColorText "" -Color White
+        Write-ColorText "  Instalando Fabric en modo terminal..." -Color Yellow
         try {
-            $process = Start-Process -FilePath "java" -ArgumentList "-jar", "`"$($fabricJar.FullName)`"" -Wait -PassThru
+            $args = @("-jar", "`"$($fabricJar.FullName)`"", "client", "-dir", "`"$MinecraftPath`"", "-mcversion", $FabricMinecraftVersion, "-loader", $FabricLoaderVersion)
+            $process = Start-Process -FilePath "java" -ArgumentList $args -Wait -PassThru -NoNewWindow
             if ($process.ExitCode -eq 0) {
                 Write-ColorText "  OK - Fabric instalado correctamente" -Color Green
-                Write-ColorText "  Esperando a que se cree el perfil..." -Color Gray
-                Start-Sleep -Seconds 5
+                Start-Sleep -Seconds 2
                 return $true
             } else {
-                Write-ColorText "  ERROR: El instalador de Fabric finalizo con errores (Codigo: $($process.ExitCode))" -Color Red
-                Write-ColorText "  Si cerraste el instalador sin completar la instalacion, vuelve a ejecutar este instalador" -Color Yellow
+                Write-ColorText "  ERROR: El instalador de Fabric finalizo con errores" -Color Red
                 return $false
             }
         } catch {
-            Write-ColorText "  ERROR: No se pudo ejecutar el instalador de Fabric" -Color Red
-            Write-ColorText "  Detalles: $_" -Color Red
+            Write-ColorText "  ERROR ejecuntando Java: $_" -Color Red
             return $false
         }
     } else {
-        Write-ColorText "ERROR: No se encontro instalador de NeoForge ni de Fabric en la carpeta 'installer'" -Color Red
-        Write-ColorText "Coloca el archivo .jar correspondiente en GameFiles/installer" -Color Red
+        Write-ColorText "ERROR: No se encontro instalador .jar en la carpeta 'installer'" -Color Red
         return $false
     }
 }
 
 function Copy-Mods {
-    Write-ColorText "`n[2/4] Copiando mods..." -Color Yellow
+    Write-ColorText "`n[2/5] Copiando mods..." -Color Yellow
     $modsSource = Join-Path $GameFilesPath "mods"
     $modsDestination = Join-Path $MinecraftPath "mods"
-    # Crear carpeta de destino si no existe
+    
     if (-not (Test-Path $modsDestination)) {
         New-Item -ItemType Directory -Path $modsDestination -Force | Out-Null
     }
-    # Eliminar mods existentes primero
-    Write-ColorText "  Eliminando mods existentes..." -Color Gray
-    $existingMods = Get-ChildItem -Path $modsDestination -Filter "*.jar" -ErrorAction SilentlyContinue
-    if ($existingMods.Count -gt 0) {
-        $deleted = 0
-        foreach ($existingMod in $existingMods) {
-            try {
-                Remove-Item -LiteralPath $existingMod.FullName -Force
-                $deleted++
-            } catch {
-                Write-ColorText "  Advertencia: No se pudo eliminar $($existingMod.Name): $_" -Color Yellow
-            }
-        }
-        Write-ColorText "  OK - $deleted mods anteriores eliminados" -Color Green
-    } else {
-        Write-ColorText "  No hay mods anteriores para eliminar" -Color Gray
-    }
-    # Obtener lista de mods
+    
+    Get-ChildItem -Path $modsDestination -Include "*.jar" -Recurse | Remove-Item -Force
+    
     $mods = Get-ChildItem -Path $modsSource -Filter "*.jar" -ErrorAction SilentlyContinue
     if ($mods.Count -eq 0) {
-        Write-ColorText "  Advertencia: No se encontraron mods en la carpeta 'mods'" -Color Yellow
+        Write-ColorText "  Advertencia: No hay mods para copiar." -Color Yellow
         return $true
     }
-    Write-ColorText "  Encontrados $($mods.Count) mods" -Color Gray
-    $copied = 0
+
     foreach ($mod in $mods) {
-        try {
-            Copy-Item -LiteralPath $mod.FullName -Destination $modsDestination -Force
-            $copied++
-            Write-ColorText "  OK - $($mod.Name)" -Color Green
-        } catch {
-            Write-ColorText "  ERROR copiando $($mod.Name): $_" -Color Red
-        }
+        Copy-Item -LiteralPath $mod.FullName -Destination $modsDestination -Force
     }
-    Write-ColorText "  OK - $copied de $($mods.Count) mods copiados correctamente" -Color Green
+    Write-ColorText "  OK - $($mods.Count) mods copiados." -Color Green
     return $true
 }
 
 function Copy-ResourcePacks {
-    Write-ColorText "`n[3/4] Copiando resource packs..." -Color Yellow
-    $resourcepacksSource = Join-Path $GameFilesPath "resourcepacks"
-    $resourcepacksDestination = Join-Path $MinecraftPath "resourcepacks"
-    # Crear carpeta de destino si no existe
-    if (-not (Test-Path $resourcepacksDestination)) {
-        New-Item -ItemType Directory -Path $resourcepacksDestination -Force | Out-Null
-    }
-    # Eliminar resource packs existentes primero
-    Write-ColorText "  Eliminando resource packs existentes..." -Color Gray
-    $existingPacks = Get-ChildItem -Path $resourcepacksDestination -Filter "*.zip" -ErrorAction SilentlyContinue
-    if ($existingPacks.Count -gt 0) {
-        $deleted = 0
-        foreach ($existingPack in $existingPacks) {
-            try {
-                Remove-Item -LiteralPath $existingPack.FullName -Force
-                $deleted++
-            } catch {
-                Write-ColorText "  Advertencia: No se pudo eliminar $($existingPack.Name): $_" -Color Yellow
-            }
+    Write-ColorText "`n[3/5] Copiando resource packs..." -Color Yellow
+    $source = Join-Path $GameFilesPath "resourcepacks"
+    $dest = Join-Path $MinecraftPath "resourcepacks"
+    
+    if (-not (Test-Path $dest)) { New-Item -ItemType Directory -Path $dest -Force | Out-Null }
+    
+    $files = Get-ChildItem -Path $source -Filter "*.zip" -ErrorAction SilentlyContinue
+    if ($files.Count -gt 0) {
+        foreach ($file in $files) {
+            Copy-Item -LiteralPath $file.FullName -Destination $dest -Force
         }
-        Write-ColorText "  OK - $deleted resource packs anteriores eliminados" -Color Green
+        Write-ColorText "  OK - $($files.Count) resource packs copiados." -Color Green
     } else {
-        Write-ColorText "  No hay resource packs anteriores para eliminar" -Color Gray
+        Write-ColorText "  No hay resource packs para copiar." -Color Gray
     }
-    # Obtener lista de resource packs
-    $resourcepacks = Get-ChildItem -Path $resourcepacksSource -Filter "*.zip" -ErrorAction SilentlyContinue
-    if ($resourcepacks.Count -eq 0) {
-        Write-ColorText "  Advertencia: No se encontraron resource packs en la carpeta 'resourcepacks'" -Color Yellow
-        return $true
-    }
-    Write-ColorText "  Encontrados $($resourcepacks.Count) resource packs" -Color Gray
-    $copied = 0
-    foreach ($pack in $resourcepacks) {
-        try {
-            Copy-Item -LiteralPath $pack.FullName -Destination $resourcepacksDestination -Force
-            $copied++
-            Write-ColorText "  OK - $($pack.Name)" -Color Green
-        } catch {
-            Write-ColorText "  ERROR copiando $($pack.Name): $_" -Color Red
-        }
-    }
-    Write-ColorText "  OK - $copied de $($resourcepacks.Count) resource packs copiados correctamente" -Color Green
     return $true
 }
 
 function Copy-ShaderPacks {
-    Write-ColorText "`n[4/4] Copiando shader packs..." -Color Yellow
-    $shaderpacksSource = Join-Path $GameFilesPath "shaderpacks"
-    $shaderpacksDestination = Join-Path $MinecraftPath "shaderpacks"
-    # Crear carpeta de destino si no existe
-    if (-not (Test-Path $shaderpacksDestination)) {
-        New-Item -ItemType Directory -Path $shaderpacksDestination -Force | Out-Null
-    }
-    # Eliminar shader packs existentes primero
-    Write-ColorText "  Eliminando shader packs existentes..." -Color Gray
-    $existingShaders = Get-ChildItem -Path $shaderpacksDestination -Filter "*.zip" -ErrorAction SilentlyContinue
-    if ($existingShaders.Count -gt 0) {
-        $deleted = 0
-        foreach ($existingShader in $existingShaders) {
-            try {
-                Remove-Item -LiteralPath $existingShader.FullName -Force
-                $deleted++
-            } catch {
-                Write-ColorText "  Advertencia: No se pudo eliminar $($existingShader.Name): $_" -Color Yellow
-            }
+    Write-ColorText "`n[4/5] Copiando shader packs..." -Color Yellow
+    $source = Join-Path $GameFilesPath "shaderpacks"
+    $dest = Join-Path $MinecraftPath "shaderpacks"
+    
+    if (-not (Test-Path $dest)) { New-Item -ItemType Directory -Path $dest -Force | Out-Null }
+    
+    $files = Get-ChildItem -Path $source -Filter "*.zip" -ErrorAction SilentlyContinue
+    if ($files.Count -gt 0) {
+        foreach ($file in $files) {
+            Copy-Item -LiteralPath $file.FullName -Destination $dest -Force
         }
-        Write-ColorText "  OK - $deleted shader packs anteriores eliminados" -Color Green
+        Write-ColorText "  OK - $($files.Count) shader packs copiados." -Color Green
     } else {
-        Write-ColorText "  No hay shader packs anteriores para eliminar" -Color Gray
+        Write-ColorText "  No hay shader packs para copiar." -Color Gray
     }
-    # Obtener lista de shader packs
-    $shaderpacks = Get-ChildItem -Path $shaderpacksSource -Filter "*.zip" -ErrorAction SilentlyContinue
-    if ($shaderpacks.Count -eq 0) {
-        Write-ColorText "  Advertencia: No se encontraron shader packs en la carpeta 'shaderpacks'" -Color Yellow
-        return $true
-    }
-    Write-ColorText "  Encontrados $($shaderpacks.Count) shader packs" -Color Gray
-    $copied = 0
-    foreach ($pack in $shaderpacks) {
-        try {
-            Copy-Item -LiteralPath $pack.FullName -Destination $shaderpacksDestination -Force
-            $copied++
-            Write-ColorText "  OK - $($pack.Name)" -Color Green
-        } catch {
-            Write-ColorText "  ERROR copiando $($pack.Name): $_" -Color Red
-        }
-    }
-    Write-ColorText "  OK - $copied de $($shaderpacks.Count) shader packs copiados correctamente" -Color Green
     return $true
 }
 
 function Copy-Configs {
-    Write-ColorText "`nCopiando archivos de configuracion..." -Color Yellow
-    $configSource = Join-Path $GameFilesPath "config"
-    $configDestination = Join-Path $MinecraftPath "config"
-    # Verificar si hay archivos de configuracion
-    $configs = Get-ChildItem -Path $configSource -Recurse -File -ErrorAction SilentlyContinue
-    if ($configs.Count -eq 0) {
-        Write-ColorText "  No hay archivos de configuracion para copiar" -Color Gray
+    Write-ColorText "`n[5/5] Copiando configuraciones (config)..." -Color Yellow
+    $source = Join-Path $GameFilesPath "config"
+    $dest = Join-Path $MinecraftPath "config"
+    
+    if (-not (Test-Path $source)) {
+        Write-ColorText "  No hay carpeta config en origen." -Color Gray
         return $true
     }
-    # Crear carpeta de destino si no existe
-    if (-not (Test-Path $configDestination)) {
-        New-Item -ItemType Directory -Path $configDestination -Force | Out-Null
+    if (-not (Test-Path $dest)) { New-Item -ItemType Directory -Path $dest -Force | Out-Null }
+    
+    Copy-Item -Path "$source\*" -Destination $dest -Recurse -Force
+    Write-ColorText "  OK - Archivos de configuracion copiados." -Color Green
+    return $true
+}
+
+function Copy-DefaultConfigs {
+    Write-ColorText "`nCopiando defaultconfigs..." -Color Yellow
+    $source = Join-Path $GameFilesPath "defaultconfigs"
+    $dest = Join-Path $MinecraftPath "defaultconfigs"
+    
+    if (-not (Test-Path $source)) {
+        Write-ColorText "  No hay carpeta defaultconfigs en origen (opcional)." -Color Gray
+        return $true
     }
-    Write-ColorText "  Encontrados $($configs.Count) archivos de configuracion" -Color Gray
-    $copied = 0
-    foreach ($config in $configs) {
-        try {
-            $relativePath = $config.FullName.Substring($configSource.Length + 1)
-            $destPath = Join-Path $configDestination $relativePath
-            $destDir = Split-Path $destPath -Parent
-            if (-not (Test-Path $destDir)) {
-                New-Item -ItemType Directory -Path $destDir -Force | Out-Null
-            }
-            Copy-Item -LiteralPath $config.FullName -Destination $destPath -Force
-            $copied++
-        } catch {
-            Write-ColorText "  ERROR copiando $($config.Name): $_" -Color Red
-        }
-    }
-    Write-ColorText "  OK - $copied archivos de configuracion copiados" -Color Green
+    if (-not (Test-Path $dest)) { New-Item -ItemType Directory -Path $dest -Force | Out-Null }
+    
+    Copy-Item -Path "$source\*" -Destination $dest -Recurse -Force
+    Write-ColorText "  OK - Defaultconfigs copiados." -Color Green
     return $true
 }
 
 function Configure-GameSettings {
-    Write-ColorText "`nConfigurando opciones del juego..." -Color Yellow
+    Write-ColorText "`nConfigurando options.txt e Iris..." -Color Yellow
     
     $optionsFile = Join-Path $MinecraftPath "options.txt"
-    
-    # Resource packs especificos a activar
     $requiredPacks = @("Alacrity.zip")
-    
-    # Shader especifico a habilitar
     $requiredShader = "Bliss_v2.1.2_(Chocapic13_Shaders_edit).zip"
-    $shaderpacksPath = Join-Path $MinecraftPath "shaderpacks"
-    $installedShader = $null
-    
-    # Verificar que el shader requerido este instalado
-    $shaderPath = Join-Path $shaderpacksPath $requiredShader
-    if (Test-Path $shaderPath) {
-        $installedShader = $requiredShader
-    } else {
-        Write-ColorText "  Advertencia: No se encontro el shader requerido: $requiredShader" -Color Yellow
-    }
-    
-    # Leer options.txt existente o crear nuevo
-    $optionsContent = @()
     
     if (Test-Path $optionsFile) {
-        $optionsContent = Get-Content $optionsFile
-    }
-    
-    # Activar resource packs especificos
-    $customPacks = ($requiredPacks | ForEach-Object { "`"file/$_`"" }) -join ","
-    $resourcePacksLine = "resourcePacks:[`"vanilla`",$customPacks,`"mod_resources`"]"
-    
-    # Buscar y reemplazar la linea de resourcePacks
-    $resourcePacksConfigured = $false
-    for ($i = 0; $i -lt $optionsContent.Count; $i++) {
-        if ($optionsContent[$i] -match '^resourcePacks:') {
-            $optionsContent[$i] = $resourcePacksLine
-            $resourcePacksConfigured = $true
-            break
-        }
-    }
-    
-    # Si no existe, agregar
-    if (-not $resourcePacksConfigured) {
-        $optionsContent += $resourcePacksLine
-    }
-    
-    Write-ColorText "  OK - Resource packs activados:" -Color Green
-    foreach ($pack in $requiredPacks) {
-        Write-ColorText "     - $pack" -Color Gray
-    }
-    
-    # Guardar options.txt
-    try {
-        $optionsContent | Set-Content -Path $optionsFile -Encoding UTF8
-        Write-ColorText "  OK - Resource packs activados en options.txt" -Color Green
-    } catch {
-        Write-ColorText "  Advertencia: No se pudo actualizar options.txt: $_" -Color Yellow
-    }
-    
-    # Configurar shader para Iris
-    if ($installedShader) {
-        $irisConfigDir = Join-Path $MinecraftPath "config\iris"
-        $irisConfigFile = Join-Path $irisConfigDir "iris.properties"
+        $content = Get-Content $optionsFile
+        $customPacks = ($requiredPacks | ForEach-Object { "`"file/$_`"" }) -join ","
+        $newLine = "resourcePacks:[`"vanilla`",$customPacks,`"mod_resources`"]"
         
-        # Crear directorio de Iris si no existe
-        if (-not (Test-Path $irisConfigDir)) {
-            New-Item -ItemType Directory -Path $irisConfigDir -Force | Out-Null
+        $replaced = $false
+        for ($i = 0; $i -lt $content.Count; $i++) {
+            if ($content[$i] -match '^resourcePacks:') {
+                $content[$i] = $newLine
+                $replaced = $true
+                break
+            }
         }
+        if (-not $replaced) { $content += $newLine }
+        $content | Set-Content -Path $optionsFile -Encoding UTF8
+        Write-ColorText "  OK - options.txt actualizado." -Color Green
+    }
+
+    $shaderPath = Join-Path $MinecraftPath "shaderpacks\$requiredShader"
+    if (Test-Path $shaderPath) {
+        $irisDir = Join-Path $MinecraftPath "config\iris"
+        if (-not (Test-Path $irisDir)) { New-Item -ItemType Directory -Path $irisDir -Force | Out-Null }
         
-        try {
-            # Crear o actualizar iris.properties
-            $irisConfig = @"
+        $irisConfig = @"
 enableShaders=true
-shaderPack=$installedShader
+shaderPack=$requiredShader
 enableDebugOptions=false
 maxShadowRenderDistance=12
 "@
-            
-            $irisConfig | Set-Content -Path $irisConfigFile -Encoding UTF8
-            Write-ColorText "  OK - Shader configurado para Iris: $installedShader" -Color Green
-        } catch {
-            Write-ColorText "  Advertencia: No se pudo configurar Iris: $_" -Color Yellow
-        }
+        $irisConfig | Set-Content -Path (Join-Path $irisDir "iris.properties") -Encoding UTF8
+        Write-ColorText "  OK - Iris configurado con $requiredShader" -Color Green
     }
-    
     return $true
 }
 
 function Configure-LauncherProfile {
-    Write-ColorText "`nConfigurando perfil del launcher..." -Color Yellow
-    
     $launcherProfilesFile = Join-Path $MinecraftPath "launcher_profiles.json"
+    if (-not (Test-Path $launcherProfilesFile)) { return $true }
     
-    if (-not (Test-Path $launcherProfilesFile)) {
-        Write-ColorText "  Advertencia: No se encontro launcher_profiles.json" -Color Yellow
-        return $true
-    }
-    
+    Write-ColorText "`nConfigurando perfil en el Launcher..." -Color Yellow
     try {
-        # Leer el archivo JSON
-        $profilesJson = Get-Content $launcherProfilesFile -Raw | ConvertFrom-Json
+        $json = Get-Content $launcherProfilesFile -Raw | ConvertFrom-Json
+        $customName = "Modpack - by MaxitoDev"
         
-        # Buscar el perfil de NeoForge (puede tener diferentes nombres)
-        $neoforgeProfile = $null
-        $neoforgeKey = $null
-        
-        foreach ($key in $profilesJson.profiles.PSObject.Properties.Name) {
-            $profile = $profilesJson.profiles.$key
-            if ($profile.name -match 'neoforge' -or $profile.lastVersionId -match 'neoforge' -or $profile.lastVersionId -match '1\.21\.1') {
-                $neoforgeProfile = $profile
-                $neoforgeKey = $key
+        foreach ($key in $json.profiles.PSObject.Properties.Name) {
+            $p = $json.profiles.$key
+            if ($p.name -match 'neoforge' -or $p.lastVersionId -match 'neoforge' -or $p.lastVersionId -match 'fabric') {
+                $p.name = $customName
+                $p.icon = "Grass"
+                $p.javaArgs = "-Xmx8G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC" 
+                Write-ColorText "  OK - Perfil actualizado: $customName" -Color Green
                 break
             }
         }
-        
-        $customName = "Modpack - by MaxitoDev - Minecraft 1.21.11"
-        
-        if ($neoforgeProfile) {
-            # Renombrar el perfil existente
-            $neoforgeProfile.name = $customName
-            $neoforgeProfile.icon = "Grass"
-            
-            # Guardar cambios
-            $profilesJson | ConvertTo-Json -Depth 10 | Set-Content $launcherProfilesFile -Encoding UTF8
-            
-            Write-ColorText "  OK - Perfil renombrado a: $customName" -Color Green
-        } else {
-            # Crear perfil nuevo si no existe
-            Write-ColorText "  Creando nuevo perfil del modpack..." -Color Gray
-            
-            $newProfileId = "modpack_maxitodev_" + (Get-Random)
-            $newProfile = @{
-                name = $customName
-                type = "custom"
-                created = (Get-Date -Format "o")
-                lastUsed = (Get-Date -Format "o")
-                icon = "Grass"
-                lastVersionId = "neoforge-21.1.37"
-                javaArgs = "-Xmx8G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M"
-            }
-            
-            # Agregar el nuevo perfil
-            $profilesJson.profiles | Add-Member -MemberType NoteProperty -Name $newProfileId -Value ([PSCustomObject]$newProfile)
-            
-            # Guardar cambios
-            $profilesJson | ConvertTo-Json -Depth 10 | Set-Content $launcherProfilesFile -Encoding UTF8
-            
-            Write-ColorText "  OK - Perfil creado: $customName" -Color Green
-        }
+        $json | ConvertTo-Json -Depth 10 | Set-Content $launcherProfilesFile -Encoding UTF8
     } catch {
-        Write-ColorText "  Advertencia: No se pudo modificar el perfil: $_" -Color Yellow
-        Write-ColorText "  Error: $_" -Color Red
+        Write-ColorText "  No se pudo configurar el perfil automaticamente." -Color Gray
     }
-    
     return $true
 }
 
 # ============================================
-# PROGRAMA PRINCIPAL
+# EJECUCION PRINCIPAL
 # ============================================
 
-Write-Header
-
-Write-ColorText "Bienvenido al instalador del modpack" -Color White
-Write-ColorText "Este instalador configurara NeoForge, mods, resource packs y shaders`n" -Color Gray
-
-# Verificar Java
 Write-ColorText "Verificando requisitos..." -Color Yellow
 if (-not (Test-JavaInstalled)) {
     Write-ColorText "ERROR: Java no esta instalado o no esta en el PATH" -Color Red
-    Write-ColorText "Por favor, instala Java 17 o superior antes de continuar" -Color Red
-    Write-ColorText "Descarga Java desde: https://adoptium.net/" -Color Cyan
     Write-Host "`nPresiona cualquier tecla para salir..."
+    $Host.UI.RawUI.FlushInputBuffer()
     $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
     exit 1
 }
 Write-ColorText "OK - Java detectado" -Color Green
 
-# Mostrar ruta de instalacion
-
-Write-ColorText "\nRuta de instalacion de Minecraft:" -Color White
-Write-ColorText "  $MinecraftPath" -Color Cyan
-
-
-# Mostrar ruta de los archivos del modpack (para debug)
-Write-ColorText "\nRuta de los archivos del modpack:" -Color White
-Write-ColorText "  $GameFilesPath" -Color Cyan
-
-Write-Host "`nDesea continuar con la instalacion? (S/N): " -NoNewline
+Write-Host "`nDesea continuar con la instalacion en: $MinecraftPath? (S/N): " -NoNewline
 $response = Read-Host
-
 if ($response -notmatch '^[SsYy]') {
-    Write-ColorText "`nInstalacion cancelada por el usuario" -Color Yellow
+    Write-ColorText "`nInstalacion cancelada." -Color Yellow
     exit 0
 }
 
@@ -595,105 +369,49 @@ Write-ColorText "INICIANDO INSTALACION" -Color Cyan
 Write-ColorText "================================================================" -Color Cyan
 Write-Host ""
 
-
-# Si la ruta es .minecraft, borrar completamente las carpetas antes de copiar lo nuevo
-if ($MinecraftPath -eq $defaultMinecraftPath) {
-    $foldersToClean = @("mods", "config", "defaultconfigs", "resourcepacks", "shaderpacks")
+if ($pathSelection -ne "2") {
+    $foldersToClean = @("mods", "config", "defaultconfigs")
     foreach ($folder in $foldersToClean) {
-        $fullPath = Join-Path $MinecraftPath $folder
-        if (Test-Path $fullPath) {
-            try {
-                Remove-Item -Path $fullPath -Recurse -Force -ErrorAction Stop
-                Write-ColorText "Eliminada carpeta antigua: $fullPath" -Color Gray
-            } catch {
-                Write-ColorText "No se pudo eliminar $fullPath: $_" -Color Yellow
-            }
-        }
+        $full = Join-Path $MinecraftPath $folder
+        if (Test-Path $full) { Remove-Item -Path $full -Recurse -Force -ErrorAction SilentlyContinue }
     }
 }
 
-# Proceso de instalacion
 $success = $true
 
+if (-not (Install-ModLoader)) { $success = $false }
 
-# Instalar modloader (NeoForge o Fabric)
-if (-not (Install-ModLoader)) {
-    $success = $false
-}
-
-# Copiar mods
 if ($success) {
-    if (-not (Copy-Mods)) {
-        $success = $false
-    }
-}
-
-# Copiar resource packs
-if ($success) {
-    if (-not (Copy-ResourcePacks)) {
-        $success = $false
-    }
-}
-
-# Copiar shader packs
-if ($success) {
-    if (-not (Copy-ShaderPacks)) {
-        $success = $false
-    }
-}
-
-
-# Copiar configuraciones y options.txt
-if ($success) {
+    Copy-Mods
+    Copy-ResourcePacks
+    Copy-ShaderPacks
     Copy-Configs
     Copy-DefaultConfigs
-    # Copiar options.txt
-    $optionsSource = Join-Path $GameFilesPath "options.txt"
-    $optionsDestination = Join-Path $MinecraftPath "options.txt"
-    if (Test-Path $optionsSource) {
-        try {
-            Copy-Item -LiteralPath $optionsSource -Destination $optionsDestination -Force
-            Write-ColorText "OK - options.txt copiado correctamente" -Color Green
-        } catch {
-            Write-ColorText "ERROR copiando options.txt: $_" -Color Red
-        }
-    } else {
-        Write-ColorText "No se encontró options.txt en GameFiles" -Color Yellow
-    }
-}
+    
+    $optSrc = Join-Path $GameFilesPath "options.txt"
+    if (Test-Path $optSrc) { Copy-Item $optSrc (Join-Path $MinecraftPath "options.txt") -Force }
 
-# Configurar opciones del juego (resource packs y shaders)
-if ($success) {
     Configure-GameSettings
+    Configure-LauncherProfile
 }
 
-# No renombramos el perfil, usamos el que crea NeoForge por defecto
-# Configure-LauncherProfile
-
-# Resultado final
 Write-Host ""
 Write-ColorText "================================================================" -Color Cyan
 
 if ($success) {
     Write-ColorText "OK - INSTALACION COMPLETADA CON EXITO!" -Color Green
     Write-Host ""
-    Write-ColorText "El modpack ha sido instalado correctamente." -Color White
-    Write-ColorText "Ahora abre el Minecraft Launcher y selecciona el perfil de NeoForge" -Color Gray
-    Write-ColorText "(busca un perfil que contenga 'neoforge' en el nombre)" -Color Gray
-    Write-Host ""
-    Write-ColorText "IMPORTANTE - Configuracion de RAM:" -Color Yellow
-    Write-ColorText "  El perfil esta configurado con 8GB de RAM" -Color White
-    Write-ColorText "  Si tienes 16GB+ de RAM, puedes aumentarla para mejor rendimiento:" -Color Gray
-    Write-ColorText "  1. Edita el perfil en el launcher (tres puntos ... → Editar)" -Color Gray
-    Write-ColorText "  2. Ve a 'Mas opciones' o 'More Options'" -Color Gray
-    Write-ColorText "  3. En 'Argumentos JVM' cambia -Xmx8G por -Xmx10G o -Xmx12G" -Color Gray
-    Write-Host ""
+    Write-ColorText "IMPORTANTE - RAM:" -Color Yellow
+    Write-ColorText "  Se ha configurado un perfil base de 8GB." -Color White
+    Write-ColorText "  Como tienes 32GB de RAM en tu PC, te recomiendo subirlo a 10GB o 12GB" -Color Gray
+    Write-ColorText "  en la configuracion del perfil del launcher." -Color Gray
 } else {
     Write-ColorText "ERROR - LA INSTALACION FINALIZO CON ERRORES" -Color Red
-    Write-Host ""
-    Write-ColorText "Revisa los mensajes anteriores para mas detalles." -Color Yellow
 }
 
 Write-ColorText "================================================================" -Color Cyan
-Write-Host "`nPresiona cualquier tecla para salir..."
+
+Write-Host "Presiona cualquier tecla para salir..." 
+$Host.UI.RawUI.FlushInputBuffer()
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+exit 0
