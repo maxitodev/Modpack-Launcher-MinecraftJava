@@ -7,12 +7,9 @@ echo ================================================================
 echo    CREANDO ARCHIVO ZIP PARA DISTRIBUCION
 echo ================================================================
 echo.
-
-REM Crear el archivo ZIP con la estructura solicitada: GameFiles/ (con carpetas y options.txt), Modpack.exe y LEEME.txt en la raíz
-powershell.exe -ExecutionPolicy Bypass -Command "Compress-Archive -Path 'Modpack.exe', 'LEEME.txt', '..\GameFiles\options.txt', '..\GameFiles\config', '..\GameFiles\installer', '..\GameFiles\mods', '..\GameFiles\resourcepacks', '..\GameFiles\shaderpacks' -DestinationPath '.\Modpack-Minecraft.zip' -Update" 
-
-REM Mover las carpetas y options.txt dentro de GameFiles en el ZIP
-powershell.exe -ExecutionPolicy Bypass -Command "Add-Type -A 'System.IO.Compression.FileSystem'; $zip = [IO.Compression.ZipFile]::Open('.\Modpack-MinecraftServer.zip', 'Update'); foreach ($item in @('options.txt','config','installer','mods','resourcepacks','shaderpacks')) { $entry = $zip.Entries | Where-Object { $_.FullName -eq $item -or $_.FullName -like ($item + '/*') }; foreach ($e in $entry) { $e.FullName = 'GameFiles/' + $e.FullName } }; $zip.Dispose()"
+REM Crear el archivo ZIP incluyendo directamente la carpeta GameFiles
+REM y dejando Modpack.exe y LEEME.txt en la raíz del ZIP
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "Set-Location ..; Compress-Archive -Path 'GameFiles','Client\\Modpack.exe','Client\\LEEME.txt' -DestinationPath 'Client\\Modpack-Minecraft_Client.zip' -Force"
 
 if %ERRORLEVEL% EQU 0 (
     echo.
@@ -20,8 +17,7 @@ if %ERRORLEVEL% EQU 0 (
     echo    ZIP CREADO EXITOSAMENTE!
     echo ================================================================
     echo.
-    echo Archivo creado: Modpack-MinecraftServer.zip
-    echo Ya puedes compartir este archivo con tus usuarios.
+    echo Archivo creado: Modpack-Minecraft_Client.zip
     echo.
 ) else (
     echo.

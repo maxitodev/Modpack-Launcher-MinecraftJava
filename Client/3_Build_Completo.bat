@@ -30,7 +30,8 @@ echo [2/2] Creando archivo ZIP...
 echo.
 
 REM Crear el ZIP
-powershell.exe -ExecutionPolicy Bypass -Command "Compress-Archive -Path 'Modpack.exe', '..\GameFiles\installer', '..\GameFiles\mods', '..\GameFiles\resourcepacks', '..\GameFiles\shaderpacks', '..\GameFiles\config', 'LEEME.txt' -DestinationPath '.\Modpack-MinecraftServer.zip' -Force"
+REM Llamar al script que crea el ZIP con la estructura requerida
+call 2_Crear_ZIP.bat
 
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: No se pudo crear el ZIP
@@ -44,6 +45,6 @@ echo ================================================================
 echo    BUILD COMPLETADO EXITOSAMENTE!
 echo ================================================================
 echo.
-echo Archivo listo para distribuir: Modpack-MinecraftServer.zip
+echo Archivo listo para distribuir: Modpack-Minecraft_Client.zip
 echo.
 pause
