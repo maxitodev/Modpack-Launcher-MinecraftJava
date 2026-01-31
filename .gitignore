@@ -1,3 +1,7 @@
+# Ignorar contenido de la carpeta mods, pero no la carpeta en sí
+GameFiles/mods/*
+!GameFiles/mods/.gitkeep
+!GameFiles/mods/.keep
 # Archivos binarios grandes - NO subir a Git
 *.jar
 *.zip
@@ -33,3 +37,8 @@ desktop.ini
 # Archivos de configuracion local
 .vscode/
 .vs/
+
+# Ignorar contenido de la carpeta config, pero no la carpeta en sí
+GameFiles/config/*
+!GameFiles/config/.gitkeep
+!GameFiles/config/.keep

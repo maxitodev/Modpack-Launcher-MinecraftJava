@@ -1,0 +1,19 @@
+#Tue Jan 06 16:36:31 EST 2026
+BLOOM_STRENGTH=1.75
+CROSSTALK=0.22
+DAMAGE_TAKEN_EFFECT=false
+LOW_HEALTH_EFFECT=false
+LPV_COLORED_CANDLES=true
+LPV_ENABLED=true
+LPV_SIZE=8
+MOTION_BLUR_STRENGTH=0.4
+POM=true
+Porosity=true
+Rough_reflections=true
+SATURATION=0.32
+SHARPENING=0.52
+Screen_Space_Reflections=true
+Sky_reflection=true
+Specular_Reflections=true
+TONEMAP=ACESFilm
+WATER_ON_CAMERA_EFFECT=false

@@ -30,7 +30,7 @@ echo [2/2] Creando archivo ZIP...
 echo.
 
 REM Crear el ZIP
-powershell.exe -ExecutionPolicy Bypass -Command "Compress-Archive -Path 'Modpack.exe', '..\installer', '..\mods', '..\resourcepacks', '..\shaderpacks', '..\config', 'LEEME.txt' -DestinationPath '.\Modpack-MinecraftServer.zip' -Force"
+powershell.exe -ExecutionPolicy Bypass -Command "Compress-Archive -Path 'Modpack.exe', '..\GameFiles\installer', '..\GameFiles\mods', '..\GameFiles\resourcepacks', '..\GameFiles\shaderpacks', '..\GameFiles\config', 'LEEME.txt' -DestinationPath '.\Modpack-MinecraftServer.zip' -Force"
 
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: No se pudo crear el ZIP
