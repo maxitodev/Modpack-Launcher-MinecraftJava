@@ -16,16 +16,21 @@ Esta carpeta contiene todos los archivos necesarios para crear el instalador del
 
 ### Para Crear el Instalador
 
-1. **Asegúrate de tener los archivos en las carpetas padre:**
-   - `../installer/` - NeoForge installer
-   - `../mods/` - Mods
-   - `../resourcepacks/` - Resource packs
-   - `../shaderpacks/` - Shader packs
-   - `../config/` - Configuraciones (opcional)
+1. **Asegúrate de tener los archivos en la carpeta GameFiles:**
+   - `../GameFiles/installer/` - NeoForge o Fabric installer (.jar)
+   - `../GameFiles/mods/` - Mods
+   - `../GameFiles/resourcepacks/` - Resource packs
+   - `../GameFiles/shaderpacks/` - Shader packs
+   - `../GameFiles/config/` - Configuraciones (opcional)
+   - `../GameFiles/options.txt` - Configuración recomendada (opcional)
 
 2. **Ejecuta:** `3_Build_Completo.bat`
 
 3. **Distribuye:** El archivo `Modpack-MaxitoDev-1.21.11.zip` generado
+
+### Instalador Automático
+
+El instalador detecta automáticamente si hay un instalador de NeoForge o Fabric en GameFiles/installer y ejecuta el que corresponda. También copia y configura automáticamente mods, resource packs, shaders, configuraciones y options.txt.
 
 ### Para Probar el Instalador
 

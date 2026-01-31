@@ -43,17 +43,18 @@ Escribe "S" y presiona Enter.
 PASO 4: ESPERAR
 ───────────────
 El instalador hara todo automaticamente:
-  - Instalara NeoForge
-  - Copiara los mods (82+ mods)
-  - Instalara resource packs
-  - Instalara shaders
-  - Configurara todo automaticamente
+  - Instalará NeoForge o Fabric (detecta automáticamente el instalador .jar en GameFiles/installer)
+  - Copiará los mods (GameFiles/mods)
+  - Instalará resource packs (GameFiles/resourcepacks)
+  - Instalará shaders (GameFiles/shaderpacks)
+  - Copiará configuraciones y options.txt (GameFiles/config y GameFiles/options.txt)
+  - Configurará automáticamente resource packs y shaders en el juego
 
 
 PASO 5: ABRIR MINECRAFT
 ───────────────────────
 1. Abre el Minecraft Launcher
-2. Busca el perfil: "Modpack - by MaxitoDev - Minecraft 1.21.11"
+2. Busca el perfil creado por el instalador (puede decir "NeoForge", "Fabric" o "Modpack - by MaxitoDev - Minecraft 1.21.11")
 3. Haz clic en JUGAR
 4. ¡Disfruta!
 
@@ -115,13 +116,14 @@ SOLUCION: Aumenta la RAM asignada al perfil
 
 ACTIVAR RESOURCE PACKS:
 ──────────────────────
+
+CONFIGURACIÓN AUTOMÁTICA:
+────────────────────────
+El instalador activa automáticamente los resource packs y shaders recomendados en options.txt. Si quieres cambiar resource packs o shaders:
+
 1. Inicia Minecraft con el perfil del modpack
-2. Ve a Opciones → Resource Packs (Paquetes de Recursos)
-3. Activa los siguientes packs (muevelos a la derecha):
-   - Alacrity
-   - FreshAnimations
-4. Haz clic en "Done" (Hecho)
-5. El juego se recargara automaticamente
+2. Ve a Opciones → Resource Packs o Shaders
+3. Activa/desactiva los que prefieras y haz clic en "Hecho"
 
 CAMBIAR SHADERS:
 ───────────────

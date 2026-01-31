@@ -84,6 +84,7 @@ PASO 6: EJECUTAR EL INSTALADOR
 
 Sigue las instrucciones en pantalla.
 El instalador creará la carpeta "minecraft-server" con todo configurado.
+Detecta automáticamente si hay instalador de NeoForge o Fabric en GameFiles/installer y ejecuta el que corresponda (si el script lo soporta).
 
 
 PASO 7: CONFIGURAR EL SERVIDOR (Opcional)
@@ -93,10 +94,13 @@ Edita la configuración antes de iniciar:
   cd minecraft-server
   nano server.properties
 
+
 Configuraciones importantes:
   - max-players=20          # Número máximo de jugadores
   - view-distance=10        # Distancia de visión (más = más RAM)
   - difficulty=normal       # Dificultad del juego
+
+Recuerda colocar los archivos fuente en GameFiles/installer, GameFiles/mods, GameFiles/config, etc. antes de crear el paquete del servidor.
 
 
 PASO 8: ABRIR PUERTO EN EL FIREWALL

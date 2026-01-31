@@ -72,14 +72,16 @@ Haz clic derecho en "Installer.ps1" → Ejecutar con PowerShell
 
 3. El instalador hará lo siguiente automáticamente:
    ✓ Verificará que Java esté instalado
-   ✓ Instalará NeoForge
-   ✓ Copiará todos los mods a .minecraft/mods
-   ✓ Copiará los resource packs a .minecraft/resourcepacks
-   ✓ Copiará los shader packs a .minecraft/shaderpacks
-   ✓ Copiará las configuraciones a .minecraft/config
+   ✓ Instalará NeoForge o Fabric (detecta automáticamente el instalador .jar en GameFiles/installer)
+   ✓ Copiará todos los mods desde GameFiles/mods a .minecraft/mods
+   ✓ Copiará los resource packs desde GameFiles/resourcepacks a .minecraft/resourcepacks
+   ✓ Copiará los shader packs desde GameFiles/shaderpacks a .minecraft/shaderpacks
+   ✓ Copiará las configuraciones desde GameFiles/config a .minecraft/config
+   ✓ Copiará options.txt si existe en GameFiles/options.txt
+   ✓ Configurará automáticamente resource packs y shaders recomendados
 
 4. Una vez terminado, abre Minecraft Launcher y selecciona
-   el perfil de NeoForge
+   el perfil creado por el instalador (puede decir "NeoForge", "Fabric" o "Modpack - by MaxitoDev - Minecraft 1.21.11")
 
 ═══════════════════════════════════════════════════════════════════
   DISTRIBUCIÓN DEL MODPACK
@@ -87,12 +89,13 @@ Haz clic derecho en "Installer.ps1" → Ejecutar con PowerShell
 
 Para compartir tu modpack con otros usuarios:
 
-1. Comprime toda esta carpeta (mcpack) en un archivo .zip
+1. Comprime toda la carpeta (mcpack) en un archivo .zip
 
 2. Los usuarios deberán:
    - Descomprimir el .zip
    - Ejecutar InstaladorModpack.exe o Ejecutar_Instalador.bat
    - Seguir las instrucciones en pantalla
+   - El instalador detecta automáticamente NeoForge o Fabric y configura todo desde GameFiles
 
 ═══════════════════════════════════════════════════════════════════
 

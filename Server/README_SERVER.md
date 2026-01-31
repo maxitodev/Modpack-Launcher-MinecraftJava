@@ -72,6 +72,12 @@ cd minecraft-server
 
 Ver: `LEEME_SERVIDOR.txt` y `../README.md`
 
+### Estructura de archivos fuente
+
+Coloca los archivos compartidos en las carpetas GameFiles/installer, GameFiles/mods, GameFiles/config, etc. antes de crear el paquete del servidor.
+
+El instalador del servidor puede detectar y ejecutar NeoForge o Fabric automáticamente si el script está preparado para ello.
+
 ## 🔧 Configuración del Servidor
 
 Después de la instalación, puedes editar:
