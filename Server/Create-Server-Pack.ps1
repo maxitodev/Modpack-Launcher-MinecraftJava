@@ -101,16 +101,96 @@ foreach ($mod in $mods) {
 Write-Host "  -> Mods incluidos: $count" -ForegroundColor Green
 Write-Host "  -> Mods excluidos (Cliente): $excluded" -ForegroundColor Red
 
-# 4. Copiar Instalador
-Write-Host "[3/4] Copiando Instalador del Loader..." -ForegroundColor Yellow
-if (Test-Path "$GameFiles/installer") {
-    Copy-Item "$GameFiles/installer" -Destination "$ServerFiles/" -Recurse
+# 4. Copiar Instalador y Generar Script de Instalación AUTOMÁTICO
+Write-Host "[3/4] Detectando Loader y generando instalador..." -ForegroundColor Yellow
+$InstallerDirSource = "$GameFiles/installer"
+$InstallerDirDest = "$ServerFiles/installer"
+
+if (Test-Path $InstallerDirSource) {
+    Copy-Item $InstallerDirSource -Destination "$ServerFiles/" -Recurse
+    
+    # Detectar el archivo JAR exacto
+    $InstallerJar = Get-ChildItem "$InstallerDirSource" -Filter "*.jar" | Select-Object -First 1
+    
+    if ($InstallerJar) {
+        $JarName = $InstallerJar.Name
+        $InstallCommand = ""
+        $LoaderType = "Desconocido"
+
+        if ($JarName -match "fabric") {
+            $LoaderType = "Fabric"
+            # Comando oficial de Fabric para servidor
+            $InstallCommand = "java -jar installer/$JarName server -dir . -downloadMinecraft"
+        }
+        elseif ($JarName -match "neoforge") {
+            $LoaderType = "NeoForge"
+            # Comando oficial de NeoForge
+            $InstallCommand = "java -jar installer/$JarName --installServer"
+        }
+
+        if ($InstallCommand) {
+            Write-Host "  -> Loader detectado: $LoaderType ($JarName)" -ForegroundColor Cyan
+            
+            # Script INSTALAR para Windows
+            # Archivo renombrado a 1_INSTALAR_SISTEMA.bat (sin emoji)
+            $InstallBat = @"
+@echo off
+title Instalador $LoaderType - MaxitoDev
+cls
+echo ==========================================
+echo    INSTALANDO SISTEMA SERVER ($LoaderType)
+echo ==========================================
+echo.
+echo Detectado: $JarName
+echo Instalando en: server_files/
+echo.
+
+cd server_files
+echo Ejecutando instalador...
+$InstallCommand
+
+echo.
+echo ==========================================
+echo  INSTALACION FINALIZADA
+echo ==========================================
+echo.
+echo AHORA:
+echo 1. Si es la primera vez, ejecuta 2_INICIAR_SERVIDOR para generar el EULA.
+echo 2. Acepta el eula.txt.
+echo 3. Juega!
+echo.
+pause
+"@
+            $InstallBat | Out-File "$ZipRoot/1_INSTALAR_SISTEMA.bat" -Encoding ASCII
+
+            # Script INSTALAR para Linux
+            $InstallSh = @"
+#!/bin/bash
+echo "=========================================="
+echo "   INSTALANDO SISTEMA SERVER ($LoaderType)"
+echo "=========================================="
+echo ""
+
+cd server_files
+echo "Ejecutando instalador..."
+$InstallCommand
+
+echo ""
+echo "Listo. Recuerda aceptar el eula.txt generado."
+"@
+            $InstallSh -replace "`r`n", "`n" | Out-File "$ZipRoot/1_INSTALAR_SISTEMA.sh" -Encoding ascii
+        }
+    }
+}
+else {
+    Write-Host "Warning: No se encontro carpeta installer." -ForegroundColor Red
 }
 
 # 5. Generar Scripts de Inicio Profesional
 Write-Host "[3.5/4] Generando scripts de inicio..." -ForegroundColor Yellow
 
-# Script de inicio en la RAÍZ (apunta a server_files)
+# Script de inicio en la RAÍZ
+# Renombrado a 2_INICIAR_SERVIDOR.bat
 $StartBat = @"
 @echo off
 title MaxitoDev Server Console
@@ -122,7 +202,7 @@ echo.
 
 cd server_files
 
-REM Verificar si existe el jar del servidor (fabric-server-launch.jar o similar)
+REM Verificar si existe el jar del servidor
 if exist server.jar (
     echo Iniciando Java...
     java -Xmx4G -jar server.jar nogui
@@ -134,9 +214,9 @@ if exist server.jar (
 
 pause
 "@
-$StartBat | Out-File "$ZipRoot/🚀_INICIAR_SERVIDOR.bat" -Encoding ASCII
+$StartBat | Out-File "$ZipRoot/2_INICIAR_SERVIDOR.bat" -Encoding ASCII
 
-# Script de inicio en la RAÍZ (Linux / Mac)
+# Script de inicio LINUX
 $StartSh = @"
 #!/bin/bash
 echo "=========================================="
@@ -156,11 +236,9 @@ else
     echo ""
 fi
 "@
-# Guardar con finales de línea Unix (LF) para evitar errores en Linux
-$StartSh -replace "`r`n", "`n" | Out-File "$ZipRoot/🚀_INICIAR_SERVIDOR.sh" -Encoding ascii
+$StartSh -replace "`r`n", "`n" | Out-File "$ZipRoot/2_INICIAR_SERVIDOR.sh" -Encoding ascii
 
-
-# Instrucciones
+# Instrucciones LEEME
 $InstallTxt = @"
 GUIA DE INSTALACION DEL SERVIDOR
 ================================
@@ -168,47 +246,34 @@ GUIA DE INSTALACION DEL SERVIDOR
 Hola! Gracias por usar el Server Pack de MaxitoDev.
 Hemos organizado todo en la carpeta 'server_files' para mantener esto limpio.
 
-PASO 1: INSTALAR EL MOTOR (Fabric/NeoForge)
--------------------------------------------
-1. Entra a la carpeta 'server_files/installer'.
-2. Ejecuta el instalador .jar que hay dentro:
-   
-   Comando: java -jar fabric-installer-x.x.x.jar server -dir .. -downloadMinecraft
-
-   (Asegurate de que se instale en la carpeta 'server_files', NO en 'installer')
-
-3. Renombra el jar que se cree (ej. fabric-server-launch.jar) a "server.jar" 
-   (o edita el script de inicio si prefieres mantener el nombre).
+PASO 1: INSTALACION AUTOMATICA
+------------------------------
+1. Ejecuta el script '1_INSTALAR_SISTEMA.bat' (o .sh en Linux).
+   Esto descargara e instalara todo lo necesario automaticamente.
 
 PASO 2: ACEPTAR EULA
 --------------------
-1. Intenta iniciar el servidor una vez (ejecuta 🚀_INICIAR_SERVIDOR.bat).
-2. Fallará y creará un archivo 'eula.txt' en 'server_files'.
-3. Abre 'server_files/eula.txt' y cambia eula=false a eula=true.
+1. Intenta iniciar el servidor (ejecuta 2_INICIAR_SERVIDOR).
+2. Fallara y creara un archivo 'server_files/eula.txt'.
+3. Abre ese archivo y cambia eula=false a eula=true.
 
-PASO 3: JUGAR
--------------
-En Windows:
-   Ejecuta 🚀_INICIAR_SERVIDOR.bat
-
-En Linux:
-   Primero da permisos: chmod +x 🚀_INICIAR_SERVIDOR.sh
-   Luego ejecuta: ./🚀_INICIAR_SERVIDOR.sh
+PASO 3: INICIAR
+---------------
+1. Vuelve a ejecutar 2_INICIAR_SERVIDOR y disfruta!
 
 "@
-$InstallTxt | Out-File "$ZipRoot/📄_LEEME_PRIMERO.txt" -Encoding UTF8
+$InstallTxt | Out-File "$ZipRoot/0_LEEME_PRIMERO.txt" -Encoding UTF8
 
 # 6. Comprimir la carpeta raíz
 Write-Host "[4/4] Creando ZIP final..." -ForegroundColor Yellow
 $ZipPath = "$OutputDir/Server-Pack-v$Version.zip"
 
-# Comprimimos desde dentro de Temp para que el ZIP contenga la carpeta raíz 'MaxitoDev-Server-Pack'
 Push-Location $TempDir
 Compress-Archive -Path "$RootName" -DestinationPath $ZipPath -Force
 Pop-Location
 
 Write-Host ""
-Write-Host "✅ LISTO! Archivo generado:" -ForegroundColor Green
-Write-Host "   $ZipPath" -ForegroundColor White
+Write-Host " [OK] LISTO! Archivo generado:" -ForegroundColor Green
+Write-Host "      $ZipPath" -ForegroundColor White
 Write-Host ""
 pause
