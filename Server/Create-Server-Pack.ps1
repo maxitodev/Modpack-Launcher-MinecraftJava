@@ -192,10 +192,10 @@ Write-Host "[3.5/4] Generando scripts de inicio..." -ForegroundColor Yellow
 # Script de inicio en la RAÍZ (apunta a server_files)
 $StartBat = @"
 @echo off
-title MaxitoDev Server Console
+title ModPack Server Console
 cls
 echo ==========================================
-echo    INICIANDO SERVIDOR MAXITODEV
+echo    INICIANDO SERVIDOR MODPACK
 echo ==========================================
 echo.
 
