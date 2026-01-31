@@ -13,7 +13,7 @@ if (!(Test-Path "build\classes")) { New-Item -ItemType Directory -Path "build\cl
 
 # Compilar
 Write-Host "[2/4] Compilando codigo Java..." -ForegroundColor Yellow
-javac -d build\classes -encoding UTF-8 src\com\maxitodev\installer\*.java
+javac -d build\classes -encoding UTF-8 --release 17 src\com\maxitodev\installer\*.java
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host ""
