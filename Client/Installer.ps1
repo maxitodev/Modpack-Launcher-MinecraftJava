@@ -20,7 +20,7 @@ if ($PSScriptRoot) {
     $ScriptPath = (Get-Location).Path
     
     # Verificar si las carpetas necesarias existen en esta ubicación
-    $testPaths = @("installer", "mods", "resourcepacks", "shaderpacks", "config")
+    $testPaths = @("installer", "mods", "resourcepacks", "shaderpacks", "config", "defaultconfig")
     $foundAll = $true
     foreach ($testPath in $testPaths) {
         if (-not (Test-Path (Join-Path $ScriptPath $testPath))) {
@@ -47,7 +47,7 @@ if ($PSScriptRoot) {
 $ParentPath = $ScriptPath
 
 # Verificar si las carpetas existen en el directorio actual
-$testPaths = @("installer", "mods", "resourcepacks", "shaderpacks", "config")
+$testPaths = @("installer", "mods", "resourcepacks", "shaderpacks", "config", "defaultconfig")
 $foundInCurrent = $true
 foreach ($testPath in $testPaths) {
     if (-not (Test-Path (Join-Path $ParentPath $testPath))) {
@@ -66,11 +66,43 @@ if (-not $foundInCurrent) {
             break
         }
     }
-    
     # Si se encuentran en el directorio padre, usar esa ruta
     if ($foundInParent) {
         $ParentPath = $ParentPathTest
     }
+}
+function Copy-DefaultConfigs {
+    Write-ColorText "`nCopiando archivos de defaultconfig..." -Color Yellow
+    $defaultConfigSource = Join-Path $ParentPath "defaultconfig"
+    $defaultConfigDestination = Join-Path $MinecraftPath "defaultconfigs"
+    # Verificar si hay archivos de defaultconfig
+    $defaultConfigs = Get-ChildItem -Path $defaultConfigSource -Recurse -File -ErrorAction SilentlyContinue
+    if ($defaultConfigs.Count -eq 0) {
+        Write-ColorText "  No hay archivos de defaultconfig para copiar" -Color Gray
+        return $true
+    }
+    # Crear carpeta de destino si no existe
+    if (-not (Test-Path $defaultConfigDestination)) {
+        New-Item -ItemType Directory -Path $defaultConfigDestination -Force | Out-Null
+    }
+    Write-ColorText "  Encontrados $($defaultConfigs.Count) archivos de defaultconfig" -Color Gray
+    $copied = 0
+    foreach ($config in $defaultConfigs) {
+        try {
+            $relativePath = $config.FullName.Substring($defaultConfigSource.Length + 1)
+            $destPath = Join-Path $defaultConfigDestination $relativePath
+            $destDir = Split-Path $destPath -Parent
+            if (-not (Test-Path $destDir)) {
+                New-Item -ItemType Directory -Path $destDir -Force | Out-Null
+            }
+            Copy-Item -LiteralPath $config.FullName -Destination $destPath -Force
+            $copied++
+        } catch {
+            Write-ColorText "  ERROR copiando $($config.Name): $_" -Color Red
+        }
+    }
+    Write-ColorText "  OK - $copied archivos de defaultconfig copiados" -Color Green
+    return $true
 }
 
 # Colores y formato
@@ -600,7 +632,8 @@ if ($success) {
 
 # Copiar configuraciones
 if ($success) {
-    Copy-Configs
+    Copy-Config
+    Copy-DefaultConfigs
 }
 
 # Configurar opciones del juego (resource packs y shaders)
