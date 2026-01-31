@@ -86,6 +86,30 @@ El instalador es una aplicación Java nativa. Para modificarla y compilarla:
 
 ---
 
+## 🛠️ Para Creadores: Generar Server Pack
+
+Hemos incluido un sistema inteligente para crear **Paquetes de Servidor** listos para producción.
+
+### ¿Qué hace el generador?
+*   ✅ **Filtrado Inteligente:** Detecta y elimina automáticamente mods "Solo Cliente" (Sodium, Iris, Mapas, Shaders, etc.) para evitar crashes y ahorrar espacio.
+*   ✅ **Estructura Limpia:** Organiza todos los archivos técnicos en una subcarpeta `server_files`.
+*   ✅ **Multiplataforma:** Genera scripts de inicio para **Windows** (`.bat`) y **Linux** (`.sh`).
+*   ✅ **Listo para usar:** Crea un ZIP final que solo tienes que subir a tu hosting y descomprimir.
+
+### Pasos para generar:
+1.  Asegúrate de que `GameFiles/mods` tenga todos los mods (el script sabrá cuáles quitar).
+2.  Abre PowerShell y ve a la carpeta `Server`:
+    ```powershell
+    cd Server
+    ```
+3.  Ejecuta el script maestro:
+    ```powershell
+    ./Create-Server-Pack.ps1
+    ```
+4.  ¡Listo! Encontrarás tu ZIP en `Server/Build/`.
+
+---
+
 ## ⚙️ Personalización y Versiones
 
 ### Cambiar Versiones (Minecraft / Fabric)
