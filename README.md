@@ -10,12 +10,11 @@ Sistema profesional de instalación de modpacks de Minecraft con interfaz gráfi
 
 ## 🌟 Características
 
-✨ **Interfaz Gráfica Moderna** - Instalador visual con Electron (próximamente)  
-🚀 **Instalación Automática** - Un clic y listo  
-🎨 **Resource Packs Incluidos** - Alacrity, FreshAnimations  
-✨ **Shaders Preconfigurados** - Bliss, Complementary Reimagined/Unbound  
-⚙️ **Configuración Optimizada** - Settings preconfigurados para mejor rendimiento  
-📦 **+80 Mods** - Experiencia completa de juego
+✨ **Nuevo Instalador Java (Swing)** - GUI nativa, ligera (~15MB RAM) y ultra-rápida.  
+🎨 **Diseño Premium** - Interfaz minimalista con fondo cinemático de Minecraft y botones animados.  
+🚀 **Instalación Inteligente** - Detecta automáticamente Fabric/NeoForge y perfila el launcher.  
+📦 **Todo en Uno** - Instala Mods, Configs, Resource Packs y Shaders en un solo paso.  
+🔧 **Logs en Tiempo Real** - Visualiza cada paso del proceso con detalles técnicos claros.
 
 ---
 
@@ -24,147 +23,88 @@ Sistema profesional de instalación de modpacks de Minecraft con interfaz gráfi
 ```
 mcpack/
 │
-├── 📁 GameFiles/              # Archivos del modpack
-│   ├── mods/                  # Coloca aquí los .jar de los mods
-│   ├── config/                # Configuraciones personalizadas
-│   ├── defaultconfigs/        # Configuraciones por defecto
-│   ├── installer/             # Instalador de NeoForge/Fabric
-│   ├── resourcepacks/         # Resource packs (.zip)
-│   ├── shaderpacks/           # Shader packs (.zip)
-│   └── options.txt            # Configuración de Minecraft
+├── 📁 GameFiles/              # Archivos del modpack (El corazón del instalador)
+│   ├── mods/                  # .jar de los mods
+│   ├── config/                # Configuraciones (.toml, .json)
+│   ├── defaultconfigs/        # Configs por defecto
+│   ├── installer/             # El instalador oficial (.jar) de Fabric/NeoForge
+│   ├── resourcepacks/         # Resource Packs (.zip)
+│   ├── shaderpacks/           # Shaders (.zip)
+│   └── options.txt            # Opciones de Minecraft preconfiguradas
 │
-├── 📁 Client/                 # Instalador para Windows
-│   ├── Installer.ps1          # Script de instalación (PowerShell)
-│   ├── 1_Compilar_Instalador.bat
-│   ├── 2_Crear_ZIP.bat
-│   └── 3_Build_Completo.bat
+├── 📁 Client/
+│   ├── 📁 java-installer/     # Código fuente del instalador Java
+│   │   ├── src/               # Código fuente (.java)
+│   │   ├── build.ps1          # Script de compilación
+│   │   └── run.bat            # Script de prueba
+│   │
+│   └── (Archivos Legacy PowerShell...)
 │
-├── 📁 Server/                 # Instalador para servidores Linux
-│   ├── install.sh
-│   └── 1_build_server.sh
-│
-└── README.md                  # Este archivo
+├── 📁 Server/                 # Scripts para servidor Linux
+└── README.md                  # Documentación
 ```
 
 ---
 
-## 🚀 Inicio Rápido
+## 🚀 Inicio Rápido (Para Usuarios)
 
-### Para Usuarios (Instalar el Modpack)
+### Requisitos:
+- ✅ **Windows 10/11**
+- ✅ **Java 17+** instalado
+- ✅ **Minecraft Launcher** instalado y ejecutado al menos una vez.
 
-#### Requisitos:
-- ✅ Windows 7 o superior
-- ✅ Java 17+ ([Descargar aquí](https://adoptium.net/))
-- ✅ Minecraft Java Edition (comprado y con launcher instalado)
-
-#### Pasos:
-1. **Descarga** el archivo `Modpack-MaxitoDev.zip`
-2. **Extrae** todo el contenido a una carpeta
-3. **Ejecuta** `Modpack.exe`
-4. **Sigue** las instrucciones en pantalla
-5. **Abre** Minecraft Launcher y selecciona el perfil "Modpack - MaxitoDev"
-6. **¡Juega!** 🎮
+### Instalación:
+1.  **Descarga** y extrae el ZIP del Modpack.
+2.  **Ejecuta** el archivo `Instalador.exe` (o el JAR generado).
+3.  Selecciona tu carpeta `.minecraft` (se detecta sola).
+4.  Haz clic en **"INSTALAR"**.
+5.  Abre el Launcher y selecciona el perfil **"Fabric Loader"** (o el que se haya creado).
 
 ---
 
-### Para Creadores (Compilar el Instalador)
+## 🛠️ Para Creadores: Compilar el Instalador
 
-#### Requisitos:
-- PowerShell 5.1+
-- Módulo PS2EXE: `Install-Module -Name ps2exe -Scope CurrentUser`
+El instalador es una aplicación Java nativa. Para modificarla y compilarla:
 
-#### Preparación:
+### Requisitos de Desarrollo:
+- **JDK 17** o superior.
+- **PowerShell** (ya viene en Windows).
 
-1. **Coloca los archivos del modpack** en las carpetas correspondientes:
+### Pasos para Compilar:
 
-```
-GameFiles/
-├── mods/              → Archivos .jar de los mods
-├── config/            → Configuraciones (.toml, .json, .cfg)
-├── installer/         → neoforge-installer.jar o fabric-installer.jar
-├── resourcepacks/     → Archivos .zip de resource packs
-├── shaderpacks/       → Archivos .zip de shaders
-└── options.txt        → Configuración de Minecraft
-```
+1.  Ve a la carpeta del código:
+    ```powershell
+    cd Client/java-installer
+    ```
 
-2. **Compila el instalador:**
+2.  Ejecuta el script de construcción:
+    ```powershell
+    ./build.ps1
+    ```
 
-```powershell
-# Opción 1: Build completo (recomendado)
-cd Client
-./3_Build_Completo.bat
-
-# Opción 2: Paso a paso
-./1_Compilar_Instalador.bat    # Crea el .exe
-./2_Crear_ZIP.bat              # Crea el paquete de distribución
-```
-
-3. **Distribuye** el archivo `Client/Modpack-MaxitoDev-1.21.11.zip`
+3.  El instalador compilado aparecerá en `Client/java-installer/build/MaxitoDev-Modpack-Installer.jar`.
 
 ---
 
-## 🎯 Roadmap - Próximas Mejoras
+## ⚙️ Personalización y Versiones
 
-### 🚧 En Desarrollo
+### Cambiar Versiones (Minecraft / Fabric)
 
-- [ ] **Interfaz Gráfica con Electron**
-  - Diseño moderno con React
-  - Barra de progreso animada
-  - Selector visual de carpeta de instalación
-  - Logs en tiempo real con colores
-  - Tema oscuro premium
+Todo se controla desde el código para máxima precisión.
 
-- [ ] **Características Adicionales**
-  - Sistema de actualizaciones automáticas
-  - Verificación de integridad de archivos
-  - Instalación de múltiples perfiles
-  - Soporte para macOS y Linux (cliente)
+1.  Abre el archivo: `Client/java-installer/src/com/maxitodev/installer/Main.java`
+2.  Edita las líneas de configuración:
+    ```java
+    public static final String MC_VERSION = "1.21.11";    // Tu versión de MC
+    public static final String LOADER_VERSION = "0.18.4"; // Tu versión de Loader
+    ```
+3.  **IMPORTANTE:** Reemplaza el archivo `.jar` en `GameFiles/installer/` con el instalador oficial de Fabric correspondiente a la versión que pusiste.
+4.  Recompila con `build.ps1`.
 
----
+### Cambiar Imagen de Fondo
 
-## 🛠️ Cómo Funciona
-
-### Proceso de Instalación:
-
-1. **Verifica Java** - Comprueba que Java 17+ esté instalado
-2. **Selecciona Ruta** - Usuario elige dónde instalar (por defecto: `.minecraft`)
-3. **Limpia Archivos Antiguos** - Elimina instalaciones previas para evitar conflictos
-4. **Instala Mod Loader** - Ejecuta el instalador de NeoForge/Fabric
-5. **Copia Archivos** - Transfiere mods, configs, resource packs y shaders
-6. **Configura Launcher** - Renombra el perfil y ajusta RAM (8GB)
-7. **¡Listo!** - El usuario puede abrir Minecraft y jugar
-
----
-
-## ⚙️ Personalización
-
-### Cambiar Versión de Minecraft/Fabric
-
-Edita `Client/Installer.ps1`:
-
-```powershell
-$FabricMinecraftVersion = "1.21.11"
-$FabricLoaderVersion = "0.18.4"
-```
-
-### Cambiar Nombre del Perfil
-
-Edita `Client/Installer.ps1`:
-
-```powershell
-$p.Value.name = "Tu Nombre Personalizado"
-```
-
-### Ajustar RAM Asignada
-
-Edita `Client/Installer.ps1`:
-
-```powershell
-$p.Value.javaArgs = "-Xmx8G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC"
-#                           ↑ Cambia 8G por la cantidad deseada (4G, 6G, 10G, etc.)
-```
-
----
+1.  Reemplaza la imagen en: `Client/java-installer/src/resources/bg.png`
+2.  Recompila.
 
 ## 🐛 Solución de Problemas
 
