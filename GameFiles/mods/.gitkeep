@@ -1,0 +1,3 @@
+# Esta carpeta debe contener los archivos .jar de los mods
+# Los archivos .jar no se suben a Git por su tamaño
+# Coloca aquí todos los mods del modpack antes de compilar el instalador

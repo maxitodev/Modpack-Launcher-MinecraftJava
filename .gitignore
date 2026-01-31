@@ -1,24 +1,37 @@
-# Ignorar contenido de la carpeta mods, pero no la carpeta en sí
-GameFiles/mods/*
-!GameFiles/mods/.gitkeep
-!GameFiles/mods/.keep
-# Archivos binarios grandes - NO subir a Git
+# ========================================
+# ARCHIVOS BINARIOS GRANDES - NO SUBIR
+# ========================================
 *.jar
 *.zip
 *.exe
 *.tar.gz
 
-# Carpetas con contenido binario
-mods/*.jar
-shaderpacks/*.zip
-installer/*.jar
+# ========================================
+# GAMEFILES - Mantener estructura vacía
+# ========================================
 
-# Mantener las carpetas vacias (crear archivos .gitkeep)
-!mods/.gitkeep
-!shaderpacks/.gitkeep
-!installer/.gitkeep
+# Ignorar TODO el contenido de GameFiles
+GameFiles/mods/*
+GameFiles/config/*
+GameFiles/defaultconfigs/*
+GameFiles/installer/*
+GameFiles/resourcepacks/*
+GameFiles/shaderpacks/*
 
-# Build outputs
+# EXCEPTO los archivos .gitkeep (para mantener carpetas)
+!GameFiles/mods/.gitkeep
+!GameFiles/config/.gitkeep
+!GameFiles/defaultconfigs/.gitkeep
+!GameFiles/installer/.gitkeep
+!GameFiles/resourcepacks/.gitkeep
+!GameFiles/shaderpacks/.gitkeep
+
+# EXCEPTO el options.txt (configuración importante)
+!GameFiles/options.txt
+
+# ========================================
+# BUILD OUTPUTS - Archivos generados
+# ========================================
 Client/*.exe
 Client/*.zip
 Server/*.tar.gz
@@ -26,7 +39,10 @@ Server/*.zip
 Server/temp_server_package.zip
 minecraft-server/
 
-# Archivos temporales de Windows
+# ========================================
+# ARCHIVOS TEMPORALES
+# ========================================
+# Windows
 Thumbs.db
 desktop.ini
 *.lnk
@@ -34,11 +50,21 @@ desktop.ini
 # Logs
 *.log
 
-# Archivos de configuracion local
+# Node.js (para Electron)
+node_modules/
+dist/
+build/
+out/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ========================================
+# CONFIGURACIÓN LOCAL
+# ========================================
 .vscode/
 .vs/
-
-# Ignorar contenido de la carpeta config, pero no la carpeta en sí
-GameFiles/config/*
-!GameFiles/config/.gitkeep
-!GameFiles/config/.keep
+.idea/
+.env
+.env.local

@@ -1,1 +1,2 @@
-# Archivo .gitkeep para mantener la carpeta config en el repositorio aunque esté vacía.
+# Esta carpeta debe contener las configuraciones personalizadas de los mods
+# Coloca aquí todos los archivos de configuración (.toml, .json, .cfg, etc.)
