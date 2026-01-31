@@ -8,11 +8,26 @@ $FabricLoaderVersion = "0.18.4"
 # INSTALADOR DE MODPACK - MAXITODEV
 # ============================================
 
-# Inicializar rutas
+# Inicializar rutas de forma inteligente
 if ($PSScriptRoot) { $ScriptPath = $PSScriptRoot } 
 elseif ($MyInvocation.MyCommand.Path) { $ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path } 
 else { $ScriptPath = (Get-Location).Path }
-$GameFilesPath = Join-Path (Split-Path $ScriptPath -Parent) "GameFiles"
+
+# Logica de busqueda de GameFiles (Arreglo para Escritorio/Descargas)
+$pathJuntoAlScript = Join-Path $ScriptPath "GameFiles"
+$pathCarpetaAtras = Join-Path (Split-Path $ScriptPath -Parent) "GameFiles"
+
+if (Test-Path $pathJuntoAlScript) {
+    $GameFilesPath = $pathJuntoAlScript
+} elseif (Test-Path $pathCarpetaAtras) {
+    $GameFilesPath = $pathCarpetaAtras
+} else {
+    Write-Host "ERROR CRITICO: No se encuentra la carpeta 'GameFiles'." -ForegroundColor Red
+    Write-Host "Asegurate de haber extraido TODO el archivo ZIP." -ForegroundColor Yellow
+    Write-Host "Presiona Enter para salir..."
+    Read-Host
+    exit
+}
 
 function Write-ColorText {
     param([string]$Text, [ConsoleColor]$Color = "White")
@@ -123,7 +138,7 @@ function Copy-Options {
     $dest = Join-Path $MinecraftPath "options.txt"
     
     if (Test-Path $source) {
-        # Copiamos el archivo TAL CUAL, sin editar nada, respetando la config del modpack
+        # Copiamos el archivo TAL CUAL, sin editar nada
         Copy-Item -Path $source -Destination $dest -Force
         Write-ColorText "  OK - Configuracion importada correctamente." -Color Green
     } else {
@@ -132,7 +147,7 @@ function Copy-Options {
 }
 
 function Configure-LauncherProfile {
-    # Solo cambiamos el nombre y RAM en el launcher, sin tocar archivos del juego
+    # Solo cambiamos el nombre y RAM en el launcher
     $file = Join-Path $MinecraftPath "launcher_profiles.json"
     if (Test-Path $file) {
         try {
