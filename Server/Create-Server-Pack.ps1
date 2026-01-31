@@ -28,7 +28,7 @@ $ClientOnlyMods = @(
     "status-effect-bars", "overflowingbars",
 
     # VISUAL Y COSMETICO
-    "3dskinlayers", "skinlayers3d", "waveycapes", "capes", "auth",
+    "3dskinlayers", "skinlayers3d", "waveycapes", "capes", "auth", "bettercombat",  
     "notenoughanimations", "animation", "playeranimation",
     "visuality", "explosiveenhancement", "particles",
     "fallingleaves", "illuminations", "effective",
@@ -189,8 +189,7 @@ else {
 # 5. Generar Scripts de Inicio Profesional
 Write-Host "[3.5/4] Generando scripts de inicio..." -ForegroundColor Yellow
 
-# Script de inicio en la RAÍZ
-# Renombrado a 2_INICIAR_SERVIDOR.bat
+# Script de inicio en la RAÍZ (apunta a server_files)
 $StartBat = @"
 @echo off
 title MaxitoDev Server Console
@@ -202,16 +201,50 @@ echo.
 
 cd server_files
 
-REM Verificar si existe el jar del servidor
-if exist server.jar (
-    echo Iniciando Java...
-    java -Xmx4G -jar server.jar nogui
-) else (
-    echo [ERROR] No se encuentra server.jar.
-    echo Por favor lee las instrucciones en LEEME.txt para instalar el Loader primero.
-    echo.
-)
+REM 1. Intentar Fabric
+if exist fabric-server-launch.jar goto START_FABRIC
 
+REM 2. Intentar NeoForge (run.bat)
+if exist run.bat goto START_NEOFORGE
+
+REM 3. Intentar Vanilla (server.jar) o fallback
+if exist server.jar goto START_VANILLA
+
+REM 4. Si no hay nada
+goto ERROR_NO_FILE
+
+:START_FABRIC
+echo [SISTEMA] Detectado Fabric Loader.
+echo Iniciando fabric-server-launch.jar...
+java -Xmx4G -jar fabric-server-launch.jar nogui
+goto END
+
+:START_NEOFORGE
+echo [SISTEMA] Detectado NeoForge.
+echo Iniciando run.bat...
+call run.bat
+goto END
+
+:START_VANILLA
+echo [SISTEMA] Solo se encontro server.jar (Vanilla).
+echo Iniciando server.jar...
+java -Xmx4G -jar server.jar nogui
+goto END
+
+:ERROR_NO_FILE
+echo [ERROR] CRITICO: No se encontraron archivos de servidor.
+echo ----------------------------------------------------
+echo Posibles causas:
+echo 1. No ejecutaste '1_INSTALAR_SISTEMA.bat' (Obligatorio).
+echo 2. La instalacion fallo o no tienes internet.
+echo ----------------------------------------------------
+echo.
+pause
+exit
+
+:END
+echo.
+echo Servidor detenido.
 pause
 "@
 $StartBat | Out-File "$ZipRoot/2_INICIAR_SERVIDOR.bat" -Encoding ASCII
@@ -226,13 +259,25 @@ echo ""
 
 cd server_files
 
-# Verificar si existe server.jar
-if [ -f "server.jar" ]; then
-    echo "Iniciando Java..."
-    java -Xmx4G -jar server.jar nogui
+SERVER_JAR="server.jar"
+
+if [ -f "fabric-server-launch.jar" ]; then
+    echo "[SISTEMA] Detectado Fabric Loader."
+    SERVER_JAR="fabric-server-launch.jar"
+elif [ -f "run.sh" ]; then
+    echo "[SISTEMA] Detectado NeoForge (usando run.sh)."
+    chmod +x run.sh
+    ./run.sh
+    exit 0
+fi
+
+# Verificar si existe el jar seleccionado
+if [ -f "\$SERVER_JAR" ]; then
+    echo "Iniciando \$SERVER_JAR..."
+    java -Xmx4G -jar \$SERVER_JAR nogui
 else
-    echo "[ERROR] No se encuentra server.jar."
-    echo "Por favor lee las instrucciones en LEEME.txt"
+    echo "[ERROR] No se encuentra \$SERVER_JAR."
+    echo "Por favor ejecuta primero 1_INSTALAR_SISTEMA."
     echo ""
 fi
 "@
