@@ -1,0 +1,23 @@
+# Carpetas de build y distribución
+build/
+dist/
+
+# Archivos compilados
+*.class
+*.jar
+
+# Archivos temporales
+*.tmp
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
